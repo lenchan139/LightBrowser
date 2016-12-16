@@ -7,7 +7,7 @@ Basically, LightBrowser is under GPLv3 but a few file is under their lincense.
 #### - Apache License 2.0
   A few files / binaries is licensing under Apache License 2.0.  
   You can go to (http://www.apache.org/licenses/LICENSE-2.0) view the full content of the license. 
-  - Droidparts && ClearableEditText
+  - Droidparts && ClearableEditText  
      Copyright 2016 Alex Yanchenko  
      
 #### - GNU General Public License v3.0
