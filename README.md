@@ -4,13 +4,13 @@ This is a Veeeeeeeeerrrrrry lightweight browser using webview. I made it because
 Basically, LightBrowser is under GPLv3 but a few file is under their lincense.
 
 #### - Apache License 2.0
-  a few files / binaries is licensing under Apache License 2.0.  
+  A few files / binaries is licensing under Apache License 2.0.  
   You can go to (http://www.apache.org/licenses/LICENSE-2.0) view the full content of the license. 
   - Droidparts && ClearableEditText
      Copyright 2016 Alex Yanchenko  
      
 #### - GNU General Public License v3.0
-  a few files is coding by myself. Those files is licensing under GPLv3.
+  A few files is coding by myself. Those files is licensing under GPLv3.  
   You can go to (http://wiki.linux.org.hk/w/GPLv3) view the full content of the license.
   
 ## Download
