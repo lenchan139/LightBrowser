@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_main"
+    tools:context="org.lenchan139.lightbrowser.MainActivity"
+    android:orientation="vertical">
+
+    <org.lenchan139.lightbrowser.Class.WebViewOverride
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/webView"
+        android:focusable="true"
+        android:layout_weight="999">
+
+    </org.lenchan139.lightbrowser.Class.WebViewOverride>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/tabBar"
+        android:layout_alignParentBottom="true"
+        android:layout_weight="1"
+        >
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/btnBack"
+            android:layout_weight="1"
+            android:text="@string/btnBackButton"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/btnForward"
+            android:text="@string/btnForwardText"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</LinearLayout>
