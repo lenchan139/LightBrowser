@@ -73,7 +73,9 @@ public class WebViewOverride extends WebView {
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
                     request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, url.substring(url.lastIndexOf("/")));
                     DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                    dm.enqueue(request);
+
+                        dm.enqueue(request);
+
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
                     intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
                     intent.setType("*/*");//any application,any extension

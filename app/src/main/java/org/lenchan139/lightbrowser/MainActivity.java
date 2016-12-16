@@ -1,15 +1,19 @@
 package org.lenchan139.lightbrowser;
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -107,6 +111,39 @@ public class MainActivity extends AppCompatActivity {
         btnGo.setVisibility(btnGo.GONE);
         btnBack.setVisibility(btnBack.GONE);
         btnForward.setVisibility(btnForward.GONE);
+
+        //permission reqeuest
+        // Here, thisActivity is the current activity
+        try {
+            if (ContextCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+
+                } else {
+
+                    // No explanation needed, we can request the permission.
+                    int STORAGE_PERMISSION_ID = 112;
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            STORAGE_PERMISSION_ID);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this, "You are running Android 5, Skip Permission Request.", Toast.LENGTH_SHORT).show();
+        }
 
 
         btnGo.setOnClickListener(new View.OnClickListener() {
