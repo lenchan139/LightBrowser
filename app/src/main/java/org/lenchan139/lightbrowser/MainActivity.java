@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
             latestUrl = getIntent().getData().toString();
         }
         webView.loadUrl(latestUrl);
-
+        webView.requestFocus();
 
     }
     @Override
