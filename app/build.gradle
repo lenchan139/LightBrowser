@@ -7,8 +7,8 @@ android {
         applicationId "org.lenchan139.lightbrowser"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 2
-        versionName 'BETA 2'
+        versionCode 3
+        versionName 'BETA 3'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

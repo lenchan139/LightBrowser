@@ -13,8 +13,8 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
-    <item android:id="@+id/menu_xmarks"
-        android:title="Xmarks"
+    <item android:id="@+id/menu_bookmarks"
+        android:title="OC Bookmarks"
         android:orderInCategory="100"
         app:showAsAction="never" />
 

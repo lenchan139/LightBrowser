@@ -247,13 +247,13 @@ public class MainActivity extends AppCompatActivity {
         }else if(id == R.id.menu_moblize){
             Toast.makeText(this, "Developing!", Toast.LENGTH_SHORT).show();
             return true;
-        }else if(id == R.id.menu_xmarks){
+        }else if(id == R.id.menu_bookmarks){
 
-            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.xmarks.android");
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("cz.nethar.owncloudbookmarks");
             if (launchIntent != null) {
                 startActivity(launchIntent);//null pointer check in case package name was not found
             }else{
-                Toast.makeText(this, "You havn't install Xmarks!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You havn't install OwnCloud Bookmarks!!", Toast.LENGTH_SHORT).show();
             }
             return  true;
         }
