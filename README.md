@@ -20,4 +20,5 @@ You can download this application from Play Store or Aptoide. Aptoide may faster
 - [Aptoide](https://lenchan139-store.store.aptoide.com/app/market/org.lenchan139.lightbrowser/2/22407821/Light+Browser%28Always+BETA%29)
 
 ## Feedback
-I doubt people use this application... However, you can send feedback or feature request by mailing to mail@lenchan139.org .
+I doubt that who will use this application...  
+However, you can send feedback or feature request by mailing to mail@lenchan139.org
