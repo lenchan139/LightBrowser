@@ -2,6 +2,7 @@ package org.lenchan139.lightbrowser;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -53,11 +55,27 @@ public class MainActivity extends AppCompatActivity {
                 backList.remove(backList.size() - 1);
                 webView.loadUrl(backList.get(backList.size() - 1));
             }else{
-                Toast.makeText(this, "No more page!", Toast.LENGTH_SHORT).show();
+                exitDialog();
             }
 
     }
+    protected void exitDialog() {
+        final String[] items = new String[] {"Yes", "No"};
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Exit the Browser?")
+                .setItems(items, new DialogInterface.OnClickListener() {
 
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
+                        if(which == 0){
+                            finish();
+                        }else if(which == 1){
+
+                        }
+                    }
+                }).create();
+        dialog.show();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
