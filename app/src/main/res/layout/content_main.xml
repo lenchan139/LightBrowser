@@ -15,12 +15,25 @@
     tools:context="org.lenchan139.lightbrowser.MainActivity"
     android:orientation="vertical">
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:id="@+id/progressL"
+        android:background="@android:color/transparent"
+        android:layout_weight="999" />
+
     <org.lenchan139.lightbrowser.Class.WebViewOverride
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/webView"
         android:focusable="true"
-        android:layout_weight="999">
+        android:layout_weight="999"
+        android:paddingBottom="0dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp" >
+
 
     </org.lenchan139.lightbrowser.Class.WebViewOverride>
 
@@ -31,6 +44,7 @@
         android:id="@+id/tabBar"
         android:layout_alignParentBottom="true"
         android:layout_weight="1"
+
         >
 
         <Button

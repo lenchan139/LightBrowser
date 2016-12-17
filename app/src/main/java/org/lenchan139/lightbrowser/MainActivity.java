@@ -9,18 +9,17 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -31,13 +30,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.lenchan139.lightbrowser.Class.*;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     WebViewOverride webView;
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     final String TAG_HOME = "homePageUrl";
     ArrayList<String> backList = new ArrayList<>();
     boolean back = false;
-
+    ProgressBar progLoading;
     @Override
     public void onBackPressed() {
         //Log.v("backListString",backList.toString());
@@ -91,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         editText = (ClearableEditText) findViewById(R.id.editText);
         btnBack = (Button) findViewById(R.id.btnBack);
         btnForward = (Button) findViewById(R.id.btnForward);
+        progLoading = (ProgressBar) findViewById(R.id.progressL) ;
         settings = getSharedPreferences(commonStrings.TAG_setting(),0);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
@@ -204,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, url.substring(url.lastIndexOf("/")));
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "d_" + url.substring(url.lastIndexOf("/")));
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
@@ -215,27 +214,49 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        webView.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
+                if(progress < 100){
+                    progLoading.setVisibility(ProgressBar.VISIBLE);
+                    progLoading.setProgress(progress);
+                }else if(progress >= 100){
+                    progLoading.setProgress(progress);
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    //progLoading.setVisibility(ProgressBar.INVISIBLE);
+                    progLoading.setProgress(0);
+                    progLoading.setVisibility(ProgressBar.GONE);
+                }
 
+            }
+        });
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
                 editText.setText(url);
 
+                if(back) {
+                    back = false;
+                }else{
+                    backList.add(url);
+                }
+                //progLoading.setProgress(50);
+
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // handle different requests for different type of files
-                // this example handles downloads requests for .apk and .mp3 files
-                // everything else the webview can handle normally
-            if(back) {
-                back = false;
-            }else{
-                backList.add(url);
-            }
                 Log.v("backListString",backList.toString());
                 tab.addPage(new Page(url, "Page"));
-
+                latestUrl = url;
                 view.loadUrl(url);
 
                 return true;
@@ -279,10 +300,11 @@ public class MainActivity extends AppCompatActivity {
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, latestUrl);
             sendIntent.setType("text/plain");
-            startActivity(sendIntent);
+            startActivity(Intent.createChooser(sendIntent, "Send to..."));
             return true;
-        }else if(id == R.id.menu_moblize){
-            Toast.makeText(this, "Developing!", Toast.LENGTH_SHORT).show();
+        }else if(id == R.id.menu_external){
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(latestUrl));
+            startActivity(browserIntent);
             return true;
         }else if(id == R.id.menu_bookmarks){
 

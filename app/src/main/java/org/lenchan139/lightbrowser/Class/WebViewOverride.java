@@ -97,7 +97,7 @@ public class WebViewOverride extends WebView {
                     sendIntent.setAction(Intent.ACTION_SEND);
                     sendIntent.putExtra(Intent.EXTRA_TEXT, url);
                     sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
+                    context.startActivity(Intent.createChooser(sendIntent, "Send to..."));;
                     Log.v("menuId","Share Link");
                 }
                 return true;

@@ -18,8 +18,8 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
-    <item android:id="@+id/menu_moblize"
-        android:title="Mobilize"
+    <item android:id="@+id/menu_external"
+        android:title="Open External"
         android:orderInCategory="100"
         app:showAsAction="never" />
 
