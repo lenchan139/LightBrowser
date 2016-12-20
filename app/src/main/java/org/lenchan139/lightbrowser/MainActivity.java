@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -200,10 +201,11 @@ public class MainActivity extends AppCompatActivity {
                                         long contentLength) {
                 DownloadManager.Request request = new DownloadManager.Request(
                         Uri.parse(url));
-
+                String cm = CookieManager.getInstance().getCookie(url);
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "d_" + url.substring(url.lastIndexOf("/")));
+                request.addRequestHeader("Cookie",cm);
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
