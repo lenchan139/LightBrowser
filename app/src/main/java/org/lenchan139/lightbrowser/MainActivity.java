@@ -266,10 +266,9 @@ public class MainActivity extends AppCompatActivity {
         });
         hideKeybord();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-        if(getIntent().getData()!= null){
-            Log.v("InURL",getIntent().getData().toString());
-            latestUrl = getIntent().getData().toString();
+        String inUrl = getIntent().getStringExtra(getString(R.string.KEY_INURL_INTENT));
+        if(inUrl != null){
+            latestUrl = inUrl;
         }
         webView.loadUrl(latestUrl);
         webView.requestFocus();
