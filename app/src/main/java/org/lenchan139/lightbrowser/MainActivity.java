@@ -316,6 +316,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "You havn't install OwnCloud Bookmarks!!", Toast.LENGTH_SHORT).show();
             }
             return  true;
+        }else if(id == R.id.menu_exit){
+            exitDialog();
         }
 
         return super.onOptionsItemSelected(item);
