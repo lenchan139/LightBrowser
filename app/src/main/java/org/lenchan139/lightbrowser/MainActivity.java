@@ -37,6 +37,7 @@ import android.widget.Toast;
 import org.lenchan139.lightbrowser.Class.*;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     WebViewOverride webView;
@@ -50,6 +51,34 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> backList = new ArrayList<>();
     boolean back = false;
     ProgressBar progLoading;
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK)
+        {
+            final String[] items = new String[backList.size()];
+            for(int i=0;i<backList.size();i++){
+                items[i] =backList.get(i);
+            }
+            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Back To(ASC):")
+                    .setItems(items, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
+                            if(which != backList.size() -1 && backList.size() >= 2) {
+                                String pushingUrl = backList.get(which);
+                                backList = new ArrayList<String>( backList.subList(0, which));
+                                webView.loadUrl(pushingUrl);
+                            }
+                        }
+                    }).create();
+            dialog.show();
+            return true;
+        }
+        return super.onKeyLongPress(keyCode, event);
+    }
+
     @Override
     public void onBackPressed() {
         //Log.v("backListString",backList.toString());
@@ -142,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }catch (Exception e){
             e.printStackTrace();
-            Toast.makeText(this, "You are running Android 5, Skip Permission Request.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You are running Android 5 or lower, Skip Permission Checking.", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -244,7 +273,13 @@ public class MainActivity extends AppCompatActivity {
                 if(back) {
                     back = false;
                 }else{
-                    backList.add(url);
+                        backList.add(url);
+
+                }
+                if(backList.size() >=2) {
+                    while (Objects.equals(backList.get(backList.size() - 1), backList.get(backList.size() - 2))) {
+                        backList.remove(backList.size()-1);
+                    }
                 }
                 //progLoading.setProgress(50);
 
@@ -270,6 +305,9 @@ public class MainActivity extends AppCompatActivity {
         if(inUrl != null){
             latestUrl = inUrl;
         }
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setDisplayZoomControls(false);
+        Log.v("USERAGENT",webView.getSettings().getUserAgentString());
         webView.loadUrl(latestUrl);
         webView.requestFocus();
 

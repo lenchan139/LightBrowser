@@ -25,7 +25,8 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".UrlFromExternalActivity">
+        <activity android:name=".UrlFromExternalActivity"
+            android:launchMode="singleInstance">
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />
 
