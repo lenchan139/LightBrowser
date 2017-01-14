@@ -108,6 +108,19 @@ public class MainActivity extends AppCompatActivity {
                 }).create();
         dialog.show();
     }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        String inUrl = intent.getStringExtra(getString(R.string.KEY_INURL_INTENT));
+        if(inUrl != null){
+            latestUrl = inUrl;
+            webView.loadUrl(latestUrl);
+        }else{
+            super.onNewIntent(intent);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -277,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 if(backList.size() >=2) {
-                    while (Objects.equals(backList.get(backList.size() - 1), backList.get(backList.size() - 2))) {
+                    while (backList.get(backList.size() - 1).equals( backList.get(backList.size() - 2))) {
                         backList.remove(backList.size()-1);
                     }
                 }
