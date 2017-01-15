@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //Log.v("backListString",backList.toString());
-            if(backList.size() >1) {
+            if(backList.size() >=2) {
                 back=true;
                 backList.remove(backList.size() - 1);
                 webView.loadUrl(backList.get(backList.size() - 1));
@@ -94,18 +94,15 @@ public class MainActivity extends AppCompatActivity {
     protected void exitDialog() {
         final String[] items = new String[] {"Yes", "No"};
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Exit the Browser?")
-                .setItems(items, new DialogInterface.OnClickListener() {
+                .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
-                        if(which == 0){
                             finish();
-                        }else if(which == 1){
-
-                        }
                     }
-                }).create();
+                }).setNegativeButton("Cancel", null)
+                .create();
         dialog.show();
     }
 
@@ -137,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         if(settings.getString(commonStrings.TAG_pref_home(),null) == null){
-            settings.edit().putString(TAG_HOME,"https://ddg.gg");
+            settings.edit().putString(TAG_HOME,"https://duckduckgo.com");
         }
 
         registerForContextMenu(webView);
@@ -172,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
 
                     // No explanation needed, we can request the permission.
+                    Toast.makeText(this, "This Appp need permission for Downloading, please allow it.", Toast.LENGTH_LONG).show();
                     int STORAGE_PERMISSION_ID = 112;
                     ActivityCompat.requestPermissions(MainActivity.this,
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -253,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
                 intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
                 intent.setType("*/*");//any application,any extension
-                Toast.makeText(getApplicationContext(), "Downloading File", //To notify the Client that the file is being downloaded
+                Toast.makeText(getApplicationContext(), "Start downloading...", //To notify the Client that the file is being downloaded
                         Toast.LENGTH_LONG).show();
 
             }
@@ -289,11 +287,7 @@ public class MainActivity extends AppCompatActivity {
                         backList.add(url);
 
                 }
-                if(backList.size() >=2) {
-                    while (backList.get(backList.size() - 1).equals( backList.get(backList.size() - 2))) {
-                        backList.remove(backList.size()-1);
-                    }
-                }
+
                 //progLoading.setProgress(50);
 
             }
@@ -301,6 +295,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                if(backList.size() >=2) {
+                    while (backList.get(backList.size() - 1).equals( backList.get(backList.size() - 2))) {
+                        backList.remove(backList.size()-1);
+                    }
+                }
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
