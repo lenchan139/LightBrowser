@@ -2,6 +2,7 @@ package org.lenchan139.lightbrowser;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,16 +35,20 @@ import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.jsoup.Jsoup;
 import org.lenchan139.lightbrowser.Class.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     WebViewOverride webView;
     Button btnGo,btnBack,btnForward;
     ClearableEditText editText;
-    String latestUrl = "https://ddg.gg/";
+    String latestUrl = "https://duckduckgo.com";
     SharedPreferences settings;
     Tab tab = new Tab(new Page("",latestUrl));
     CommonStrings commonStrings = new CommonStrings();
@@ -57,23 +62,30 @@ public class MainActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK)
         {
             final String[] items = new String[backList.size()];
+            Collections.reverse(backList);
             for(int i=0;i<backList.size();i++){
                 items[i] =backList.get(i);
             }
-            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Back To(ASC):")
+            Collections.reverse(backList);
+            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Back To(DESC):")
                     .setItems(items, new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
                             if(which != backList.size() -1 && backList.size() >= 2) {
+
+                                Collections.reverse(backList);
                                 String pushingUrl = backList.get(which);
-                                backList = new ArrayList<String>( backList.subList(0, which));
+                                backList = new ArrayList<String>( backList.subList(which,backList.size()-1));
+                                Collections.reverse(backList);
                                 webView.loadUrl(pushingUrl);
+
                             }
                         }
                     }).create();
             dialog.show();
+
             return true;
         }
         return super.onKeyLongPress(keyCode, event);
@@ -277,16 +289,28 @@ public class MainActivity extends AppCompatActivity {
         });
         webView.setWebViewClient(new WebViewClient() {
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            public void onPageStarted(WebView view, final String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
+                webView.requestFocus();
                 editText.setText(url);
+                if(url.indexOf("http:") >=0 || url.indexOf("https:") >= 0) {
 
-                if(back) {
-                    back = false;
                 }else{
-                        backList.add(url);
-
+                    back = true;
+                    runToExternal(url);
+                    webView.loadUrl(backList.get(backList.size()-1));
                 }
+
+                        String cm = CookieManager.getInstance().getCookie(url);
+                        if(cm == null){ cm = ""; }
+
+
+                        if(back ) {
+                            back = false;
+                        }else{
+                            backList.add(url);
+
+                        }
 
                 //progLoading.setProgress(50);
 
@@ -296,7 +320,8 @@ public class MainActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 if(backList.size() >=2) {
-                    while (backList.get(backList.size() - 1).equals( backList.get(backList.size() - 2))) {
+                    while (Objects.equals(backList.get(backList.size() - 1), backList.get(backList.size() - 2))) {
+                        if(backList.size()>=2)
                         backList.remove(backList.size()-1);
                     }
                 }
@@ -306,7 +331,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.v("backListString",backList.toString());
                 tab.addPage(new Page(url, "Page"));
                 latestUrl = url;
-                view.loadUrl(url);
+                    view.loadUrl(url);
+
 
                 return true;
             }
@@ -323,6 +349,15 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl(latestUrl);
         webView.requestFocus();
 
+    }
+    private void runToExternal(String url){
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        try {
+            startActivity(browserIntent);
+        }catch (ActivityNotFoundException e){
+            e.printStackTrace();
+            Toast.makeText(this,"No Handler here.",Toast.LENGTH_SHORT);
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -382,11 +417,13 @@ public class MainActivity extends AppCompatActivity {
     }
     public void loadUrlFromEditText(){
         String temp = editText.getText().toString().trim();
-        if(temp.indexOf("ddg.gg") >=0 || temp.indexOf("duckduckgo.com") >= 0){
+        if(temp.contains("ddg.gg") || temp.contains("duckduckgo.com")){
             webView.loadUrl(temp);
         }else if (temp.indexOf("https://") == 0 || temp.indexOf("http://") == 0) {
             webView.loadUrl( temp);
-        } else if(!temp.contains(".")){
+        } else if(temp.indexOf(":") >= 1) {
+            runToExternal(temp);
+        }else if(!temp.contains(".")){
             webView.loadUrl(  commonStrings.searchHeader() + temp);
         }
         else{
