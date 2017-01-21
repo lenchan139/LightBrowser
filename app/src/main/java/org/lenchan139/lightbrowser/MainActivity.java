@@ -62,23 +62,20 @@ public class MainActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK)
         {
             final String[] items = new String[backList.size()];
-            Collections.reverse(backList);
+
             for(int i=0;i<backList.size();i++){
                 items[i] =backList.get(i);
             }
-            Collections.reverse(backList);
             AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Back To(DESC):")
                     .setItems(items, new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
-                            if(which != backList.size() -1 && backList.size() >= 2) {
+                            if(which != 0 && backList.size() >= 2) {
 
-                                Collections.reverse(backList);
                                 String pushingUrl = backList.get(which);
-                                backList = new ArrayList<String>( backList.subList(which,backList.size()-1));
-                                Collections.reverse(backList);
+                                backList = new ArrayList<String>( backList.subList(which,backList.size()));
                                 webView.loadUrl(pushingUrl);
 
                             }
@@ -308,23 +305,30 @@ public class MainActivity extends AppCompatActivity {
                         if(back ) {
                             back = false;
                         }else{
-                            backList.add(url);
+                            backList.add(0,url);
 
                         }
 
                 //progLoading.setProgress(50);
+                if(backList.size() >=2) {
+                    try {
 
+
+                        while (Objects.equals(backList.get(0), backList.get(1))) {
+
+                            if (backList.size() >= 2)
+                                backList.remove(0);
+                        }
+                    }catch (IndexOutOfBoundsException e){
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if(backList.size() >=2) {
-                    while (Objects.equals(backList.get(backList.size() - 1), backList.get(backList.size() - 2))) {
-                        if(backList.size()>=2)
-                        backList.remove(backList.size()-1);
-                    }
-                }
+
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
