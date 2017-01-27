@@ -1,6 +1,7 @@
 package org.lenchan139.lightbrowser;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -12,6 +13,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -52,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences settings;
     Tab tab = new Tab(new Page("",latestUrl));
     CommonStrings commonStrings = new CommonStrings();
-    final String TAG_HOME = "homePageUrl";
     ArrayList<String> backList = new ArrayList<>();
     boolean back = false;
     ProgressBar progLoading;
@@ -64,7 +67,9 @@ public class MainActivity extends AppCompatActivity {
             final String[] items = new String[backList.size()];
 
             for(int i=0;i<backList.size();i++){
-                items[i] =backList.get(i);
+                String  temp = backList.get(i);
+                if(temp.length() >50){ temp = temp.substring(0,50) + " ...";}
+                items[i] = temp;
             }
             AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Back To(DESC):")
                     .setItems(items, new DialogInterface.OnClickListener() {
@@ -93,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
         //Log.v("backListString",backList.toString());
             if(backList.size() >=2) {
                 back=true;
-                backList.remove(backList.size() - 1);
-                webView.loadUrl(backList.get(backList.size() - 1));
+                backList.remove(0);
+                webView.loadUrl(backList.get(0));
             }else{
                 exitDialog();
             }
@@ -128,6 +133,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        initFabButton();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -139,23 +150,22 @@ public class MainActivity extends AppCompatActivity {
         btnBack = (Button) findViewById(R.id.btnBack);
         btnForward = (Button) findViewById(R.id.btnForward);
         progLoading = (ProgressBar) findViewById(R.id.progressL) ;
-        settings = getSharedPreferences(commonStrings.TAG_setting(),0);
+        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         if(settings.getString(commonStrings.TAG_pref_home(),null) == null){
-            settings.edit().putString(TAG_HOME,"https://duckduckgo.com");
+            latestUrl = "https://duckduckgo.com";
+            settings.edit().putString(commonStrings.TAG_pref_home(),latestUrl).commit();
         }
-
         registerForContextMenu(webView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                callFabButton();
             }
         });
-        fab.setVisibility(Button.GONE);
+        initFabButton();
         btnGo.setVisibility(btnGo.GONE);
         btnBack.setVisibility(btnBack.GONE);
         btnForward.setVisibility(btnForward.GONE);
@@ -291,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
                 webView.requestFocus();
                 editText.setText(url);
                 if(url.indexOf("http:") >=0 || url.indexOf("https:") >= 0) {
-
+                    //addToBack(url);
                 }else{
                     back = true;
                     runToExternal(url);
@@ -302,12 +312,17 @@ public class MainActivity extends AppCompatActivity {
                         if(cm == null){ cm = ""; }
 
 
-                        if(back ) {
-                            back = false;
-                        }else{
-                            backList.add(0,url);
 
-                        }
+            }
+
+
+            public void addToBack(String url){
+                if(back ) {
+                    back = false;
+                }else{
+                    backList.add(0,url);
+
+                }
 
                 //progLoading.setProgress(50);
                 if(backList.size() >=2) {
@@ -324,11 +339,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-
+                addToBack(url);
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -336,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
                 tab.addPage(new Page(url, "Page"));
                 latestUrl = url;
                     view.loadUrl(url);
-
+                //addToBack(url);
 
                 return true;
             }
@@ -360,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(browserIntent);
         }catch (ActivityNotFoundException e){
             e.printStackTrace();
-            Toast.makeText(this,"No Handler here.",Toast.LENGTH_SHORT);
+            Toast.makeText(this,"No Handler here.",Toast.LENGTH_SHORT).show();
         }
     }
     @Override
@@ -369,7 +383,14 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+    public void shareCurrPage(){
 
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, latestUrl);
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Send to..."));
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -379,18 +400,14 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-
-            Toast.makeText(this, "Developing!", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+            startActivity(intent);
             return true;
         }else if(id == R.id.menu_home){
-            webView.loadUrl(new CommonStrings().homePage());
+            webView.loadUrl(settings.getString(commonStrings.TAG_pref_home(),""));
             return true;
         }else if(id == R.id.menu_share){
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, latestUrl);
-            sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, "Send to..."));
+            shareCurrPage();
             return true;
         }else if(id == R.id.menu_external){
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(latestUrl));
@@ -407,6 +424,8 @@ public class MainActivity extends AppCompatActivity {
             return  true;
         }else if(id == R.id.menu_exit){
             exitDialog();
+        }else if(id == R.id.menu_refresh){
+            loadUrlFromEditText();
         }
 
         return super.onOptionsItemSelected(item);
@@ -421,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void loadUrlFromEditText(){
         String temp = editText.getText().toString().trim();
-        if(temp.contains("ddg.gg") || temp.contains("duckduckgo.com")){
+        if(false){
             webView.loadUrl(temp);
         }else if (temp.indexOf("https://") == 0 || temp.indexOf("http://") == 0) {
             webView.loadUrl( temp);
@@ -436,5 +455,38 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public void initFabButton(){
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        String curr = settings.getString(commonStrings.TAG_pref_fab(),null);
+        if(Objects.equals(curr, commonStrings.ARRAY_pref_fab()[1])){
+            fab.setVisibility(View.VISIBLE);
+            fab.setImageResource(R.drawable.fab_home);
+        }else if(Objects.equals(curr, commonStrings.ARRAY_pref_fab()[2])){
+            fab.setVisibility(View.VISIBLE);
+            fab.setImageResource(R.drawable.fab_refresh);
+        }else if(Objects.equals(curr, commonStrings.ARRAY_pref_fab()[3])){
+            fab.setVisibility(View.VISIBLE);
+            fab.setImageResource(R.drawable.fab_share);
+        }else{
+            fab.setVisibility(View.GONE);
+        }
+
+    }
+
+    public void callFabButton(){
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        String curr = settings.getString(commonStrings.TAG_pref_fab(),null);
+        if(Objects.equals(curr, commonStrings.ARRAY_pref_fab()[1])){
+            webView.loadUrl(settings.getString(commonStrings.TAG_pref_home(),""));
+        }else if(Objects.equals(curr, commonStrings.ARRAY_pref_fab()[2])){
+            loadUrlFromEditText();
+        }else if(Objects.equals(curr, commonStrings.ARRAY_pref_fab()[3])){
+            shareCurrPage();
+        }else{
+            fab.setVisibility(View.GONE);
+        }
     }
 }
