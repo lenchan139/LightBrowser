@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                                 String pushingUrl = backList.get(which);
                                 backList = new ArrayList<String>( backList.subList(which,backList.size()));
                                 webView.loadUrl(pushingUrl);
+                                latestUrl = pushingUrl;
 
                             }
                         }
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 back=true;
                 backList.remove(0);
                 webView.loadUrl(backList.get(0));
+                latestUrl = backList.get(0);
             }else{
                 exitDialog();
             }
@@ -411,7 +413,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }else if(id == R.id.menu_external){
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(latestUrl));
-            startActivity(browserIntent);
+            try {
+                startActivity(browserIntent);
+            }catch(ActivityNotFoundException e){
+                Toast.makeText(this, "No handler.", Toast.LENGTH_SHORT).show();
+            }
             return true;
         }else if(id == R.id.menu_bookmarks){
 
