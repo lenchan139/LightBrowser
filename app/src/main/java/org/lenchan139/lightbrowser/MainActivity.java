@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 backList.remove(0);
                 webView.loadUrl(backList.get(0));
                 latestUrl = backList.get(0);
+
             }else{
                 exitDialog();
             }
@@ -272,12 +274,18 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
                 intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
                 intent.setType("*/*");//any application,any extension
-                Toast.makeText(getApplicationContext(), "Start downloading...", //To notify the Client that the file is being downloaded
+                Toast.makeText(getApplicationContext(), "File Downloading...", //To notify the Client that the file is being downloaded
                         Toast.LENGTH_LONG).show();
 
             }
         });
         webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onCloseWindow(WebView window) {
+                onBackPressed();
+                super.onCloseWindow(window);
+            }
+
             public void onProgressChanged(WebView view, int progress) {
                 if(progress < 100){
                     progLoading.setVisibility(ProgressBar.VISIBLE);
@@ -382,9 +390,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        //menu.findItem(R.id.menu_bookmarks).setVisible(false);
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
+
+
     public void shareCurrPage(){
 
         Intent sendIntent = new Intent();
@@ -395,6 +407,7 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -419,15 +432,32 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "No handler.", Toast.LENGTH_SHORT).show();
             }
             return true;
-        }else if(id == R.id.menu_bookmarks){
-
-            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("cz.nethar.owncloudbookmarks");
-            if (launchIntent != null) {
-                startActivity(launchIntent);//null pointer check in case package name was not found
+        }else if(id == R.id.menu_add_bookmark){
+            String url3 = settings.getString(commonStrings.TAG_pref_oc_bookmark_url(),"");
+            if(!url3.endsWith("/"))
+                url3 = url3 + "/";
+            String title = webView.getTitle();
+            if(url3.startsWith("http")){
+                String outUrl = url3
+                        + "index.php/apps/bookmarks/bookmarklet?output=popup&url="
+                        + url3
+                        + "&title="
+                        + title;
+                webView.loadUrl(outUrl);
             }else{
-                Toast.makeText(this, "You havn't install OwnCloud Bookmarks!!", Toast.LENGTH_SHORT).show();
+
             }
-            return  true;
+        }else if(id == R.id.menu_bookmarks){
+            //Intent launchIntent = getPackageManager().getLaunchIntentForPackage("cz.nethar.owncloudbookmarks");
+           //startActivity(launchIntent);//null pointer check in case package name was not found
+            String url3 = settings.getString(commonStrings.TAG_pref_oc_bookmark_url(),"");
+            if(!url3.endsWith("/"))
+                url3 = url3 + "/";
+            String title = webView.getTitle();
+            if(url3.startsWith("http")) {
+                String outUrl = url3 + "index.php/apps/bookmarks/";
+                webView.loadUrl(outUrl);
+            }
         }else if(id == R.id.menu_exit){
             exitDialog();
         }else if(id == R.id.menu_refresh){

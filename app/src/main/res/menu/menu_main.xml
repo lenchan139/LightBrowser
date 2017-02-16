@@ -3,29 +3,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.lenchan139.lightbrowser.MainActivity" >
 
-    <item android:id="@+id/menu_home"
-        android:title="Home"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+     <item android:id="@+id/menu_home"
+         android:title="Home"
+         android:icon="@android:drawable/ic_btn_speak_now"
+         android:orderInCategory="100"
+         app:showAsAction="never" />
 
-    <item android:id="@+id/menu_refresh"
-        android:title="Refresh"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+     <item android:id="@+id/menu_refresh"
+         android:title="Refresh"
+         android:orderInCategory="100"
+         app:showAsAction="never" />
 
-    <item android:id="@+id/menu_share"
-        android:title="Share"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
-
-    <item android:id="@+id/menu_bookmarks"
-        android:title="OC Bookmarks"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+            <item android:id="@+id/menu_share"
+                android:title="Share"
+                android:orderInCategory="100"
+                app:showAsAction="never" />
 
     <item android:id="@+id/menu_external"
         android:title="Open External"
         android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item android:id="@+id/menu_add_bookmark"
+        android:title="Add OC Bookmark"
+        android:orderInCategory="100"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item android:id="@+id/menu_bookmarks"
+        android:title="View OC Bookmarks"
+        android:orderInCategory="100"
+        android:visible="true"
         app:showAsAction="never" />
 
     <item android:id="@+id/action_settings"

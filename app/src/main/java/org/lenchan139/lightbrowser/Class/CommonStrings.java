@@ -19,4 +19,5 @@ public class CommonStrings {
     public String TAG_pref_fab(){return "org.lenchan139.lightbrowser.Fab";}
     public String[] ARRAY_pref_fab(){return new String[]{"Disable", "Home", "Refresh", "Share"};}
     public  String STR_INTENT_MainToSetting (){return "org.lenchan139.lightbrowser.STR_INTENT_MainToSetting";}
+    public  String TAG_pref_oc_bookmark_url (){return "org.lenchan139.lightbrowser.TAG_pref_oc_bookmark_url";}
 }

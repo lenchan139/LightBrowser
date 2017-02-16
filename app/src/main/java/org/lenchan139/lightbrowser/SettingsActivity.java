@@ -55,6 +55,7 @@ CommonStrings commonStrings = new CommonStrings();
         listSetting.clear();
         listSetting.add(new SettingsViewItem("Homepage",sp.getString(commonStrings.TAG_pref_home(),"Default"),null));
         listSetting.add(new SettingsViewItem("FAB Button",sp.getString(commonStrings.TAG_pref_fab(),"Disabled"),null));
+        listSetting.add(new SettingsViewItem("Owncloud Address",sp.getString(commonStrings.TAG_pref_oc_bookmark_url(),"Disabled"),null));
         listViewSetting.setAdapter(new SettingsLVAdpter(this,listSetting));
 
         listViewSetting.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -64,6 +65,8 @@ CommonStrings commonStrings = new CommonStrings();
                     onClickHome();
                 }else if(position == 1){
                     onClickFabButton();
+                }else if(position == 2){
+                    onClickOCloudUrl();
                 }
                 Object o = listViewSetting.getItemAtPosition(position);
                 SettingsViewItem str = (SettingsViewItem) o;//As you are using Default String Adapter
@@ -99,6 +102,45 @@ CommonStrings commonStrings = new CommonStrings();
                             Toast.makeText(SettingsActivity.this, "Change saved.", Toast.LENGTH_SHORT).show();
                         }else{
                             sp.edit().putString(commonStrings.TAG_pref_home(),txtUrl.getText().toString()).commit();
+                            Toast.makeText(SettingsActivity.this, "Change saved.", Toast.LENGTH_SHORT).show();
+                        }
+                        initListView();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
+    }
+
+    public void onClickOCloudUrl(){
+        final ClearableEditText txtUrl = new ClearableEditText(this);
+
+// Set the default text to a link of the Queen
+        txtUrl.setHint("Enter your Owncloud Address ...");
+        txtUrl.setText(sp.getString(commonStrings.TAG_pref_oc_bookmark_url(),null));
+        txtUrl.setPadding(30,15,30,15);
+        txtUrl.setSingleLine(true);
+        txtUrl.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        new AlertDialog.Builder(this)
+                .setTitle("Owncloud Address")
+                //.setMessage("Enter new URL of homepage")
+                .setView(txtUrl)
+                .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String temp = txtUrl.getText().toString();
+
+                        if(!temp.endsWith("/")){ temp = temp + "/";}
+
+                        if((!temp.startsWith("http")) && (!temp.contains("."))){
+                            Toast.makeText(SettingsActivity.this, "Discard! Due to Invaild URL.", Toast.LENGTH_SHORT).show();
+                        }else if(!txtUrl.getText().toString().startsWith("http")){
+                            temp = "http://"+temp;
+                            sp.edit().putString(commonStrings.TAG_pref_oc_bookmark_url(),txtUrl.getText().toString()).commit();
+                            Toast.makeText(SettingsActivity.this, "Change saved.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            sp.edit().putString(commonStrings.TAG_pref_oc_bookmark_url(),txtUrl.getText().toString()).commit();
                             Toast.makeText(SettingsActivity.this, "Change saved.", Toast.LENGTH_SHORT).show();
                         }
                         initListView();
