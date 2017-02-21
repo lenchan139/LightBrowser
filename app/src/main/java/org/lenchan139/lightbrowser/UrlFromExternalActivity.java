@@ -24,6 +24,7 @@ public class UrlFromExternalActivity extends AppCompatActivity {
             Intent intent = new Intent(this,MainActivity.class);
             intent.putExtra("InURL",inURL);
             startActivity(intent);
+            inURL = null;
 
         }
         finish();

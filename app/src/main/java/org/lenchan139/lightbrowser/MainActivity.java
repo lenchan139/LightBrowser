@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences settings;
     Tab tab = new Tab(new Page("",latestUrl));
     CommonStrings commonStrings = new CommonStrings();
-    ArrayList<String> backList = new ArrayList<>();
+    ArrayList<Page> backList = new ArrayList<>();
     boolean back = false;
     ProgressBar progLoading;
 
@@ -65,12 +65,18 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK)
         {
+            //create String[] for showing
             final String[] items = new String[backList.size()];
 
             for(int i=0;i<backList.size();i++){
-                String  temp = backList.get(i);
+                String  temp = backList.get(i).getTitle();
                 if(temp.length() >50){ temp = temp.substring(0,50) + " ...";}
-                items[i] = temp;
+                //if title too short, use url instead
+                if(temp.length() > 3) {
+                    items[i] = temp;
+                }else{
+                    items[i] = temp;
+                }
             }
             AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Back To(DESC):")
                     .setItems(items, new DialogInterface.OnClickListener() {
@@ -80,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
                             //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
                             if(which != 0 && backList.size() >= 2) {
 
-                                String pushingUrl = backList.get(which);
-                                backList = new ArrayList<String>( backList.subList(which,backList.size()));
+                                String pushingUrl = backList.get(which).getUrl();
+                                backList = new ArrayList<Page>( backList.subList(which,backList.size()));
                                 webView.loadUrl(pushingUrl);
                                 latestUrl = pushingUrl;
 
@@ -101,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
             if(backList.size() >=2) {
                 back=true;
                 backList.remove(0);
-                webView.loadUrl(backList.get(0));
-                latestUrl = backList.get(0);
+                webView.loadUrl(backList.get(0).getUrl());
+                latestUrl = backList.get(0).getUrl();
 
             }else{
                 exitDialog();
@@ -286,6 +292,12 @@ public class MainActivity extends AppCompatActivity {
                 super.onCloseWindow(window);
             }
 
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+                super.onReceivedTitle(view, title);
+                Log.v("currWebViewTitle",title);
+            }
+
             public void onProgressChanged(WebView view, int progress) {
                 if(progress < 100){
                     progLoading.setVisibility(ProgressBar.VISIBLE);
@@ -305,8 +317,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         webView.setWebViewClient(new WebViewClient() {
+            Boolean loadingFinish = true;
+            Boolean redirectPage = false;
             @Override
             public void onPageStarted(WebView view, final String url, Bitmap favicon) {
+                loadingFinish = false;
                 super.onPageStarted(view, url, favicon);
                 webView.requestFocus();
                 editText.setText(url);
@@ -315,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     back = true;
                     runToExternal(url);
-                    webView.loadUrl(backList.get(backList.size()-1));
+                    webView.loadUrl(backList.get(backList.size()-1).getUrl());
                 }
 
                         String cm = CookieManager.getInstance().getCookie(url);
@@ -326,11 +341,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            public void addToBack(String url){
+            public void addToBack(String url,String title){
                 if(back ) {
                     back = false;
                 }else{
-                    backList.add(0,url);
+                    backList.add(0,new Page(url,title));
 
                 }
 
@@ -352,12 +367,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                addToBack(url);
+                if(!redirectPage){
+                    loadingFinish = true;
+                }
+
+                if(loadingFinish && !redirectPage){
+                    //HIDE LOADING IT HAS FINISHED
+                    addToBack(url,view.getTitle());
+                } else{
+                    redirectPage = false;
+                }
+
             }
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Log.v("backListString",backList.toString());
                 tab.addPage(new Page(url, "Page"));
+                if (!loadingFinish) {
+                    redirectPage = true;
+                }
+
+                loadingFinish = false;
                 latestUrl = url;
                     view.loadUrl(url);
                 //addToBack(url);
@@ -368,8 +398,10 @@ public class MainActivity extends AppCompatActivity {
         hideKeybord();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         String inUrl = getIntent().getStringExtra(getString(R.string.KEY_INURL_INTENT));
-        if(inUrl != null){
+        getIntent().putExtra(getString(R.string.KEY_INURL_INTENT), "");
+        if(inUrl != null && inUrl !=""){
             latestUrl = inUrl;
+
         }
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
