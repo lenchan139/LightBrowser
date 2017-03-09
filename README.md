@@ -18,6 +18,7 @@ Basically, LightBrowser is under GPLv3 but a few file is under their lincense.
 You can download this application from Play Store or Aptoide. Aptoide may faster than the Play Store.
 - [Play Store](https://play.google.com/store/apps/details?id=org.lenchan139.lightbrowser)
 - [Aptoide](https://lenchan139-store.store.aptoide.com/app/market/org.lenchan139.lightbrowser/2/22407821/Light+Browser%28Always+BETA%29)
+- [APK file](https://github.com/lenchan139/LightBrowser/blob/master/app/app-release.apk?raw=true)
 
 ## Feedback
 I doubt that who will use this application...  
