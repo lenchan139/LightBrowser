@@ -1,6 +1,7 @@
 package org.lenchan139.lightbrowser;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -20,12 +22,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.ValueCallback;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -43,11 +48,14 @@ import android.widget.Toast;
 import org.jsoup.Jsoup;
 import org.lenchan139.lightbrowser.Class.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+
+import static android.R.attr.data;
 
 public class MainActivity extends AppCompatActivity {
     WebViewOverride webView;
@@ -61,15 +69,59 @@ public class MainActivity extends AppCompatActivity {
     boolean back = false;
     ProgressBar progLoading;
 
+    private ValueCallback mUploadMessage;
+    private final static int FILECHOOSER_RESULTCODE = 1;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (null == mUploadMessage) return;
+            Uri result = data == null || resultCode != RESULT_OK ? null : data.getData();
+            if (result == null) {
+                mUploadMessage.onReceiveValue(null);
+                mUploadMessage = null;
+                return;
+            }
+            //CLog.i("UPFILE", "onActivityResult" + result.toString());
+            String path =  FileUtils.getPath(this, result);
+            if (TextUtils.isEmpty(path)) {
+                mUploadMessage.onReceiveValue(null);
+                mUploadMessage = null;
+                return;
+            }
+            Uri uri = Uri.fromFile(new File(path));
+            ///CLog.i("UPFILE", "onActivityResult after parser uri:" + uri.toString());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mUploadMessage.onReceiveValue(new Uri[]{uri});
+            } else {
+                mUploadMessage.onReceiveValue(uri);
+            }
+            mUploadMessage = null;
+        }
+        }
+
+
+
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK)
         {
-            //create String[] for showing
-            final String[] items = new String[backList.size()];
+            final WebBackForwardList webList = webView.copyBackForwardList();
 
-            for(int i=0;i<backList.size();i++){
-                String  temp = backList.get(i).getTitle();
+            //create String[] for showing
+            final String[] items = new String[webList.getSize()];
+            //store list to string[] with reverse sorting
+            for(int i=0;i<webList.getSize();i++){
+                String  temp = webList.getItemAtIndex(webList.getSize()-1-i).getTitle();
+                //handling if current tab
+                if (i == webList.getSize() -1 - webList.getCurrentIndex() ){
+                    //Log.v("test",String.valueOf(webList.getSize() -1 - webList.getCurrentIndex()) );
+                    temp = "◆" + temp;
+                }else{
+                    temp = "◇" + temp;
+                }
+                
                 if(temp.length() >50){ temp = temp.substring(0,50) + " ...";}
                 //if title too short, use url instead
                 if(temp.length() > 3) {
@@ -78,17 +130,21 @@ public class MainActivity extends AppCompatActivity {
                     items[i] = temp;
                 }
             }
-            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Back To(DESC):")
+
+            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("History:")
                     .setItems(items, new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
-                            if(which != 0 && backList.size() >= 2) {
-
-                                String pushingUrl = backList.get(which).getUrl();
-                                backList = new ArrayList<Page>( backList.subList(which,backList.size()));
-                                webView.loadUrl(pushingUrl);
+                            if(which >= 0) {
+                                //reverse the number
+                                which = webList.getSize()-1-which;
+                                String pushingUrl = webList.getItemAtIndex(which).getUrl();
+                                //int a1 = which - webView.copyBackForwardList().getCurrentIndex();
+                                //Log.v("test", String.valueOf(a1));
+                                webView.goBackOrForward(which - webView.copyBackForwardList().getCurrentIndex());
+                                //webView.loadUrl(pushingUrl);
                                 latestUrl = pushingUrl;
 
                             }
@@ -104,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //Log.v("backListString",backList.toString());
-            if(backList.size() >=2) {
+            /*if(backList.size() >=2) {
                 back=true;
                 backList.remove(0);
                 webView.loadUrl(backList.get(0).getUrl());
@@ -112,7 +168,12 @@ public class MainActivity extends AppCompatActivity {
 
             }else{
                 exitDialog();
-            }
+            }*/
+        if(webView.canGoBack()) {
+            webView.goBack();
+        }else{
+            exitDialog();
+        }
 
     }
     protected void exitDialog() {
@@ -298,6 +359,27 @@ public class MainActivity extends AppCompatActivity {
                 Log.v("currWebViewTitle",title);
             }
 
+            //Android 5.0+ Uploads
+            @Override
+            @SuppressLint("NewApi")
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                if (mUploadMessage != null) {
+                    mUploadMessage.onReceiveValue(null);
+                }
+                //CLog.i("UPFILE", "file chooser params：" + fileChooserParams.toString());
+                mUploadMessage =  filePathCallback;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                if (fileChooserParams != null && fileChooserParams.getAcceptTypes() != null
+                        && fileChooserParams.getAcceptTypes().length > 0) {
+                    i.setType(fileChooserParams.getAcceptTypes()[0]);
+                } else {
+                    i.setType("*/*");
+                }
+                startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+                return true;
+            }
+
             public void onProgressChanged(WebView view, int progress) {
                 if(progress < 100){
                     progLoading.setVisibility(ProgressBar.VISIBLE);
@@ -386,7 +468,6 @@ public class MainActivity extends AppCompatActivity {
                 if (!loadingFinish) {
                     redirectPage = true;
                 }
-
                 loadingFinish = false;
                 latestUrl = url;
                     view.loadUrl(url);
@@ -433,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, latestUrl);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Send to..."));
     }
@@ -457,7 +538,7 @@ public class MainActivity extends AppCompatActivity {
             shareCurrPage();
             return true;
         }else if(id == R.id.menu_external){
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(latestUrl));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webView.getUrl()));
             try {
                 startActivity(browserIntent);
             }catch(ActivityNotFoundException e){
