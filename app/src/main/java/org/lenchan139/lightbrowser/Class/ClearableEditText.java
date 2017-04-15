@@ -39,6 +39,8 @@ import static org.droidparts.util.Strings.isNotEmpty;
  */
 public class ClearableEditText extends EditText implements OnTouchListener, OnFocusChangeListener, TextWatcherListener {
 
+
+
     public static enum Location {
         LEFT(0), RIGHT(2);
 

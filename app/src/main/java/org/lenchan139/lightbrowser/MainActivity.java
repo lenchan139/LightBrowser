@@ -47,6 +47,7 @@ import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.lenchan139.lightbrowser.Class.*;
+import org.lenchan139.lightbrowser.History.HistroySQLiteController;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,14 +62,12 @@ public class MainActivity extends AppCompatActivity {
     WebViewOverride webView;
     Button btnGo,btnBack,btnForward;
     ClearableEditText editText;
-    String latestUrl = "https://duckduckgo.com";
     SharedPreferences settings;
-    Tab tab = new Tab(new Page("",latestUrl));
     CommonStrings commonStrings = new CommonStrings();
     ArrayList<Page> backList = new ArrayList<>();
     boolean back = false;
     ProgressBar progLoading;
-
+    String homeUrl;
     private ValueCallback mUploadMessage;
     private final static int FILECHOOSER_RESULTCODE = 1;
 
@@ -145,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                                 //Log.v("test", String.valueOf(a1));
                                 webView.goBackOrForward(which - webView.copyBackForwardList().getCurrentIndex());
                                 //webView.loadUrl(pushingUrl);
-                                latestUrl = pushingUrl;
+
 
                             }
                         }
@@ -184,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Toast.makeText(MainActivity.this, items[which], Toast.LENGTH_SHORT).show();
-                            finish();
+                        finish();
+                        android.os.Process.killProcess(android.os.Process.myPid());
                     }
                 }).setNegativeButton("Cancel", null)
                 .create();
@@ -196,8 +196,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         String inUrl = intent.getStringExtra(getString(R.string.KEY_INURL_INTENT));
         if(inUrl != null){
-            latestUrl = inUrl;
-            webView.loadUrl(latestUrl);
+            editText.setText(inUrl);
+            loadUrlFromEditText();
         }else{
             super.onNewIntent(intent);
         }
@@ -224,10 +224,9 @@ public class MainActivity extends AppCompatActivity {
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-        if(settings.getString(commonStrings.TAG_pref_home(),null) == null){
-            latestUrl = "https://duckduckgo.com";
-            settings.edit().putString(commonStrings.TAG_pref_home(),latestUrl).commit();
-        }
+
+        homeUrl = settings.getString(commonStrings.TAG_pref_home(),commonStrings.URL_DDG());
+
         registerForContextMenu(webView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -286,24 +285,14 @@ public class MainActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String get = tab.moveToPervious().getUrl();
-                if(get == null){
-                    Toast.makeText(MainActivity.this, "No more page!", Toast.LENGTH_SHORT).show();
-                }else {
-                    webView.loadUrl(get);
-                }
+
             }
         });
 
         btnForward.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String get = tab.moveToNext().getUrl();
-                if(get == null){
-                    Toast.makeText(MainActivity.this, "No more page!", Toast.LENGTH_SHORT).show();
-                }else {
-                    webView.loadUrl(get);
-                }
+
             }
         });
         editText.setOnKeyListener(new View.OnKeyListener() {
@@ -341,11 +330,21 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
                 intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
                 intent.setType("*/*");//any application,any extension
-                Toast.makeText(getApplicationContext(), "File Downloading...", //To notify the Client that the file is being downloaded
+                Toast.makeText(getApplicationContext(), "Downloading...", //To notify the Client that the file is being downloaded
                         Toast.LENGTH_LONG).show();
 
             }
         });
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,SearchActivity.class);
+                intent.putExtra("para",editText.getText().toString());
+                startActivity(intent);
+                webView.requestFocus();
+            }
+        });
+        editText.setFocusable(false);
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onCloseWindow(WebView window) {
@@ -366,13 +365,16 @@ public class MainActivity extends AppCompatActivity {
                 if (mUploadMessage != null) {
                     mUploadMessage.onReceiveValue(null);
                 }
-                //CLog.i("UPFILE", "file chooser params：" + fileChooserParams.toString());
+                Log.i("UPFILE", "file chooser params：" + fileChooserParams.toString());
                 mUploadMessage =  filePathCallback;
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.addCategory(Intent.CATEGORY_OPENABLE);
+
+                Log.v("acceptType", String.valueOf(fileChooserParams.getAcceptTypes()[0].toString()));
                 if (fileChooserParams != null && fileChooserParams.getAcceptTypes() != null
                         && fileChooserParams.getAcceptTypes().length > 0) {
                     i.setType(fileChooserParams.getAcceptTypes()[0]);
+                    i.setType("*/*");
                 } else {
                     i.setType("*/*");
                 }
@@ -455,7 +457,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if(loadingFinish && !redirectPage){
                     //HIDE LOADING IT HAS FINISHED
-                    addToBack(url,view.getTitle());
+                    //addToBack(url,view.getTitle());
+                    HistroySQLiteController hs = new HistroySQLiteController(MainActivity.this);
+                    hs.addHistory(view.getTitle(),view.getUrl());
                 } else{
                     redirectPage = false;
                 }
@@ -464,12 +468,10 @@ public class MainActivity extends AppCompatActivity {
 
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Log.v("backListString",backList.toString());
-                tab.addPage(new Page(url, "Page"));
                 if (!loadingFinish) {
                     redirectPage = true;
                 }
                 loadingFinish = false;
-                latestUrl = url;
                     view.loadUrl(url);
                 //addToBack(url);
 
@@ -480,17 +482,22 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         String inUrl = getIntent().getStringExtra(getString(R.string.KEY_INURL_INTENT));
         getIntent().putExtra(getString(R.string.KEY_INURL_INTENT), "");
-        if(inUrl != null && inUrl !=""){
-            latestUrl = inUrl;
+        if(inUrl != null && !Objects.equals(inUrl, "")){
+            editText.setText(inUrl);
+            loadUrlFromEditText();
 
+        }else{
+            webView.loadUrl(homeUrl);
         }
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
         Log.v("USERAGENT",webView.getSettings().getUserAgentString());
-        webView.loadUrl(latestUrl);
+
         webView.requestFocus();
 
     }
+
+
     private void runToExternal(String url){
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         try {
@@ -545,32 +552,28 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "No handler.", Toast.LENGTH_SHORT).show();
             }
             return true;
-        }else if(id == R.id.menu_add_bookmark){
-            String url3 = settings.getString(commonStrings.TAG_pref_oc_bookmark_url(),"");
-            if(!url3.endsWith("/"))
-                url3 = url3 + "/";
-            String title = webView.getTitle();
-            if(url3.startsWith("http")){
-                String outUrl = url3
-                        + "index.php/apps/bookmarks/bookmarklet?output=popup&url="
-                        + url3
-                        + "&title="
-                        + title;
-                webView.loadUrl(outUrl);
-            }else{
+        }
+        else if(id == R.id.menu_add_bookmark){
+            Intent intent = new Intent(this,HistoryActivity.class);
+            startActivity(intent);
 
+        }
+        else if(id == R.id.menu_bookmarks){
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("org.lenchan139.ncbookmark");
+            try {
+                startActivity(launchIntent);//null pointer check in case package name was not found
+            }catch (NullPointerException e){
+                Toast.makeText(this,"NCBookmark not installed!",Toast.LENGTH_SHORT);
             }
-        }else if(id == R.id.menu_bookmarks){
-            //Intent launchIntent = getPackageManager().getLaunchIntentForPackage("cz.nethar.owncloudbookmarks");
-           //startActivity(launchIntent);//null pointer check in case package name was not found
-            String url3 = settings.getString(commonStrings.TAG_pref_oc_bookmark_url(),"");
+            /*String url3 = settings.getString(commonStrings.TAG_pref_oc_bookmark_url(),"");
             if(!url3.endsWith("/"))
                 url3 = url3 + "/";
             String title = webView.getTitle();
             if(url3.startsWith("http")) {
                 String outUrl = url3 + "index.php/apps/bookmarks/";
                 webView.loadUrl(outUrl);
-            }
+
+            }*/
         }else if(id == R.id.menu_exit){
             exitDialog();
         }else if(id == R.id.menu_refresh){

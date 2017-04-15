@@ -4,4 +4,5 @@
     <string name="btnBackButton"><![CDATA[<<]]></string>
     <string name="btnForwardText"><![CDATA[>>]]></string>
     <string name="KEY_INURL_INTENT">InURL</string>
+    <string name="title_activity_search">SearchActivity</string>
 </resources>

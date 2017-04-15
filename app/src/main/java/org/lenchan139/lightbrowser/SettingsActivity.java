@@ -55,7 +55,7 @@ CommonStrings commonStrings = new CommonStrings();
         listSetting.clear();
         listSetting.add(new SettingsViewItem("Homepage",sp.getString(commonStrings.TAG_pref_home(),"Default"),null));
         listSetting.add(new SettingsViewItem("FAB Button",sp.getString(commonStrings.TAG_pref_fab(),"Disabled"),null));
-        listSetting.add(new SettingsViewItem("Owncloud Address",sp.getString(commonStrings.TAG_pref_oc_bookmark_url(),"Disabled"),null));
+        //listSetting.add(new SettingsViewItem("Owncloud Address",sp.getString(commonStrings.TAG_pref_oc_bookmark_url(),"Disabled"),null));
         listViewSetting.setAdapter(new SettingsLVAdpter(this,listSetting));
 
         listViewSetting.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -66,7 +66,7 @@ CommonStrings commonStrings = new CommonStrings();
                 }else if(position == 1){
                     onClickFabButton();
                 }else if(position == 2){
-                    onClickOCloudUrl();
+                    //onClickOCloudUrl();
                 }
                 Object o = listViewSetting.getItemAtPosition(position);
                 SettingsViewItem str = (SettingsViewItem) o;//As you are using Default String Adapter

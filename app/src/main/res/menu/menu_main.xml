@@ -20,20 +20,20 @@
                 app:showAsAction="never" />
 
     <item android:id="@+id/menu_external"
-        android:title="Open External"
+        android:title="Open With"
         android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item android:id="@+id/menu_add_bookmark"
-        android:title="Add OC Bookmark"
-        android:orderInCategory="100"
-        android:visible="true"
         app:showAsAction="never" />
     <item android:id="@+id/menu_bookmarks"
-        android:title="View OC Bookmarks"
+        android:title="NCBookmarks"
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
 
+    <item android:id="@+id/menu_add_bookmark"
+        android:title="History"
+        android:orderInCategory="100"
+        android:visible="true"
+        app:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="Settings"
         android:orderInCategory="100"
