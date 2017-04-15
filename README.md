@@ -15,7 +15,8 @@ Basically, LightBrowser is under GPLv3 but a few file is under their lincense.
   You can go to (http://wiki.linux.org.hk/w/GPLv3) view the full content of the license.
   
 ## Screenshots
-![screenshot1](https://github.com/lenchan139/LightBrowser/blob/master/screenshots/photo_2017-04-15_16-52-30.jpg?raw=true)
+<img src="https://github.com/lenchan139/LightBrowser/blob/master/screenshots/photo_2017-04-15_16-52-30.jpg?raw=true" width="320">
+![screenshot1]()
 ![screenshot2](https://github.com/lenchan139/LightBrowser/blob/master/screenshots/photo_2017-04-15_16-52-32.jpg?raw=true)
 ![screenshot3](https://github.com/lenchan139/LightBrowser/blob/master/screenshots/photo_2017-04-15_16-52-36.jpg?raw=true)
 ## Download
