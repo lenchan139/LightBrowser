@@ -14,6 +14,10 @@ Basically, LightBrowser is under GPLv3 but a few file is under their lincense.
   A few files is coding by myself. Those files is licensing under GPLv3.  
   You can go to (http://wiki.linux.org.hk/w/GPLv3) view the full content of the license.
   
+## Screenshots
+![screenshot1](https://github.com/lenchan139/LightBrowser/blob/master/screenshots/photo_2017-04-15_16-52-30.jpg?raw=true)
+![screenshot2](https://github.com/lenchan139/LightBrowser/blob/master/screenshots/photo_2017-04-15_16-52-32.jpg?raw=true)
+![screenshot3](https://github.com/lenchan139/LightBrowser/blob/master/screenshots/photo_2017-04-15_16-52-36.jpg?raw=true)
 ## Download
 You can download this application from Play Store or Aptoide. Aptoide may faster than the Play Store.
 - [Play Store](https://play.google.com/store/apps/details?id=org.lenchan139.lightbrowser)
