@@ -57,10 +57,12 @@ public class HistroySQLiteController {
         return  result;
     }
     public ArrayList<HistoryItem> getHistoryBySearchUrl(String keyword){
+        keyword.replace(" ","%");
         ArrayList<HistoryItem> result = new ArrayList<HistoryItem>();
         SQLiteDatabase db = historySQLiteHelper.getReadableDatabase();
         String sqlSelct = "SELECT * FROM " + historySQLiteHelper.get_TableName() +
                 " WHERE _url LIKE \"%" + keyword + "%\"" +
+                " OR _title LIKE \"%" + keyword + "%\"" +
                 " GROUP BY _url" +
                 " ORDER BY LENGTH(_url) ASC";
         Cursor cursor = null;
