@@ -23,4 +23,5 @@
     <string name="setting_string_cancel">Cancel</string>
     <string name="setting_string_fabbutton_mode">Fab button mode</string>
     <string name="setting_string_save_turn_to">Saved! Now turn to</string>
+    <string name="setting_activity">Settings</string>
 </resources>
