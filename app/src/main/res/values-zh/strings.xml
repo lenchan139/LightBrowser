@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Light Browser</string>
+    <string name="action_settings">設定</string>
+    <string name="btnBackButton" translatable="false"></string>
+    <string name="title_activity_search">搜尋</string>
+    <string name="menu_exit">結束</string>
+    <string name="menu_history">瀏覽歷史</string>
+    <string name="menu_home">主頁</string>
+    <string name="menu_ncbookmarks">NC書籤</string>
+    <string name="menu_open_with">開啓於…</string>
+    <string name="menu_refresh">重整頁面</string>
+    <string name="menu_settings">設定</string>
+    <string name="menu_share">共享</string>
+    <string name="setting_string_">無效URL！儲存失敗！</string>
+    <string name="setting_string_apply">儲存</string>
+    <string name="setting_string_cancel">取消</string>
+    <string name="setting_string_default">預設值</string>
+    <string name="setting_string_disabled">停用</string>
+    <string name="setting_string_fabbutton">浮動按鈕</string>
+    <string name="setting_string_fabbutton_mode">浮動按鈕之模式</string>
+    <string name="setting_string_homepage">首頁</string>
+    <string name="setting_string_save_change">設定已儲存</string>
+    <string name="setting_string_save_turn_to">儲存成功！現在設定值是：</string>
+</resources>

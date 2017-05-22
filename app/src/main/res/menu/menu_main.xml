@@ -4,43 +4,43 @@
     tools:context="org.lenchan139.lightbrowser.MainActivity" >
 
      <item android:id="@+id/menu_home"
-         android:title="Home"
+         android:title="@string/menu_home"
          android:icon="@android:drawable/ic_btn_speak_now"
          android:orderInCategory="100"
          app:showAsAction="never" />
 
      <item android:id="@+id/menu_refresh"
-         android:title="Refresh"
+         android:title="@string/menu_refresh"
          android:orderInCategory="100"
          app:showAsAction="never" />
 
             <item android:id="@+id/menu_share"
-                android:title="Share"
+                android:title="@string/menu_share"
                 android:orderInCategory="100"
                 app:showAsAction="never" />
 
     <item android:id="@+id/menu_external"
-        android:title="Open With"
+        android:title="@string/menu_open_with"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item android:id="@+id/menu_bookmarks"
-        android:title="NCBookmarks"
+        android:title="@string/menu_ncbookmarks"
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
 
     <item android:id="@+id/menu_add_bookmark"
-        android:title="History"
+        android:title="@string/menu_history"
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
     <item android:id="@+id/action_settings"
-        android:title="Settings"
+        android:title="@string/menu_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
 
     <item android:id="@+id/menu_exit"
-        android:title="Exit"
+        android:title="@string/menu_exit"
         android:orderInCategory="100"
         app:showAsAction="never" />
 </menu>

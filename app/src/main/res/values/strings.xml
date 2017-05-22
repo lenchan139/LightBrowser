@@ -1,8 +1,26 @@
 <resources>
     <string name="app_name">Light Browser</string>
     <string name="action_settings">Settings</string>
-    <string name="btnBackButton"><![CDATA[<<]]></string>
-    <string name="btnForwardText"><![CDATA[>>]]></string>
-    <string name="KEY_INURL_INTENT">InURL</string>
+    <string name="btnBackButton" translatable="false"><![CDATA[<<]]></string>
+    <string name="btnForwardText" translatable="false"><![CDATA[>>]]></string>
+    <string name="KEY_INURL_INTENT" translatable="false">InURL</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_open_with">Open With</string>
+    <string name="menu_ncbookmarks">NCBookmarks</string>
+    <string name="menu_history">History</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_exit">Exit</string>
+    <string name="setting_string_homepage">Homepage</string>
+    <string name="setting_string_fabbutton">FAB Button</string>
+    <string name="setting_string_default">Default</string>
+    <string name="setting_string_disabled">Disabled</string>
+    <string name="setting_string_">Discard! Due to Invaild URL.</string>
+    <string name="setting_string_save_change">Change saved.</string>
+    <string name="setting_string_apply">Apply</string>
+    <string name="setting_string_cancel">Cancel</string>
+    <string name="setting_string_fabbutton_mode">Fab button mode</string>
+    <string name="setting_string_save_turn_to">Saved! Now turn to</string>
 </resources>

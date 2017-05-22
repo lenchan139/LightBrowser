@@ -46,8 +46,8 @@ class SettingsActivity : AppCompatActivity() {
 
         listViewSetting = findViewById(R.id.settingList) as ListView
         listSetting.clear()
-        listSetting.add(SettingsViewItem("Homepage", sp!!.getString(commonStrings.TAG_pref_home(), "Default"), null))
-        listSetting.add(SettingsViewItem("FAB Button", sp!!.getString(commonStrings.TAG_pref_fab(), "Disabled"), null))
+        listSetting.add(SettingsViewItem(getString(R.string.setting_string_homepage), sp!!.getString(commonStrings.TAG_pref_home(), getString(R.string.setting_string_default)), null))
+        listSetting.add(SettingsViewItem(getString(R.string.setting_string_fabbutton), sp!!.getString(commonStrings.TAG_pref_fab(), getString(R.string.setting_string_disabled)), null))
         //listSetting.add(new SettingsViewItem("Owncloud Address",sp.getString(commonStrings.TAG_pref_oc_bookmark_url(),"Disabled"),null));
         listViewSetting!!.adapter = SettingsLVAdpter(this, listSetting)
 
@@ -80,21 +80,21 @@ class SettingsActivity : AppCompatActivity() {
                 .setTitle("Custom Homepage")
                 //.setMessage("Enter new URL of homepage")
                 .setView(txtUrl)
-                .setPositiveButton("Apply") { dialog, whichButton ->
+                .setPositiveButton(getString(R.string.setting_string_apply)) { dialog, whichButton ->
                     var temp = txtUrl.text.toString()
                     if (!temp.startsWith("http") && !temp.contains(".")) {
-                        Toast.makeText(this@SettingsActivity, "Discard! Due to Invaild URL.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_), Toast.LENGTH_SHORT).show()
                     } else if (!txtUrl.text.toString().startsWith("http")) {
                         temp = "http://" + temp
                         sp!!.edit().putString(commonStrings.TAG_pref_home(), txtUrl.text.toString()).commit()
-                        Toast.makeText(this@SettingsActivity, "Change saved.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_change), Toast.LENGTH_SHORT).show()
                     } else {
                         sp!!.edit().putString(commonStrings.TAG_pref_home(), txtUrl.text.toString()).commit()
-                        Toast.makeText(this@SettingsActivity, "Change saved.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_change), Toast.LENGTH_SHORT).show()
                     }
                     initListView()
                 }
-                .setNegativeButton("Cancel") { dialog, whichButton -> }
+                .setNegativeButton(getString(R.string.setting_string_cancel)) { dialog, whichButton -> }
                 .show()
     }
 
@@ -145,10 +145,10 @@ class SettingsActivity : AppCompatActivity() {
                 oldPos = i
             }
         }
-        val dialog = AlertDialog.Builder(this).setTitle("Fab button mode").setIcon(R.mipmap.ic_launcher)
+        val dialog = AlertDialog.Builder(this).setTitle(getString(R.string.setting_string_fabbutton_mode)).setIcon(R.mipmap.ic_launcher)
                 .setSingleChoiceItems(items, oldPos) { dialog, which ->
                     sp!!.edit().putString(commonStrings.TAG_pref_fab(), items[which]).apply()
-                    Toast.makeText(this@SettingsActivity, "Saved! Now turn to " + sp!!.getString(commonStrings.TAG_pref_fab(), null) + "!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_turn_to) + sp!!.getString(commonStrings.TAG_pref_fab(), null) + "!", Toast.LENGTH_SHORT).show()
 
                     dialog.dismiss()
                     initListView()
