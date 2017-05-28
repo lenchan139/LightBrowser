@@ -24,18 +24,26 @@
         android:layout_weight="999" />
 
     <org.lenchan139.lightbrowser.Class.WebViewOverride
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/webView1"
         android:focusable="true"
         android:layout_weight="999"
         android:paddingBottom="0dp"
         android:paddingLeft="0dp"
         android:paddingRight="0dp"
-        android:paddingTop="0dp" >
-
-
-    </org.lenchan139.lightbrowser.Class.WebViewOverride>
+        android:paddingTop="0dp" />
+    <org.lenchan139.lightbrowser.Class.WebViewOverride
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/webView2"
+        android:visibility="gone"
+        android:focusable="true"
+        android:layout_weight="999"
+        android:paddingBottom="0dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

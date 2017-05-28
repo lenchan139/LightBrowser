@@ -28,7 +28,11 @@
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
-
+    <item android:id="@+id/menu_tab"
+        android:title="@string/menu_switch_tab"
+        android:orderInCategory="100"
+        android:visible="true"
+        app:showAsAction="never" />
     <item android:id="@+id/menu_add_bookmark"
         android:title="@string/menu_history"
         android:orderInCategory="100"

@@ -22,4 +22,7 @@
     <string name="setting_string_save_change">設定已儲存</string>
     <string name="setting_string_save_turn_to">儲存成功！現在設定值是：</string>
     <string name="setting_activity">設定</string>
+    <string name="menu_switch_tab">切換分頁</string>
+    <string name="multi_tab_turn_primary_tab">切換到主要分頁</string>
+    <string name="multi_tab_turn_secondary_tab">切換到次要分頁</string>
 </resources>

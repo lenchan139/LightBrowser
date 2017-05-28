@@ -57,6 +57,8 @@ import java.util.Objects
 
 import android.R.attr.data
 import android.R.attr.webViewStyle
+import android.text.Editable
+import android.widget.ImageButton
 
 class MainActivity : AppCompatActivity() {
     private lateinit var  webView: WebViewOverride
@@ -71,7 +73,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progLoading: ProgressBar
     private lateinit var homeUrl: String
     private var mUploadMessage: ValueCallback<Any?>? = null
-
+    private var webviewBundleSaved = false
+    private var webviewBundle : Bundle = Bundle()
+    private lateinit var btnSwitchWebView : Button
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILECHOOSER_RESULTCODE) {
@@ -205,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
-        webView = findViewById(R.id.webView) as WebViewOverride
+        webView = findViewById(R.id.webView1) as WebViewOverride
         btnGo = findViewById(R.id.btnGo) as Button
         editText = findViewById(R.id.editText) as ClearableEditText
         btnBack = findViewById(R.id.btnBack) as Button
@@ -214,7 +218,10 @@ class MainActivity : AppCompatActivity() {
         settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         webView.settings.javaScriptEnabled = true
         webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-
+        btnSwitchWebView = findViewById(R.id.btnSwitchView) as Button
+        btnSwitchWebView.setOnClickListener {
+            switchTab()
+        }
         homeUrl = settings.getString(commonStrings.TAG_pref_home(), commonStrings.URL_DDG())
 
         registerForContextMenu(webView)
@@ -302,138 +309,144 @@ class MainActivity : AppCompatActivity() {
             webView.requestFocus()
         }
         editText.isFocusable = false
-        webView.setWebChromeClient(object : WebChromeClient() {
-            override fun onCloseWindow(window: WebView) {
-                onBackPressed()
-                super.onCloseWindow(window)
-            }
 
-            override fun onReceivedTitle(view: WebView, title: String) {
-                super.onReceivedTitle(view, title)
-                Log.v("currWebViewTitle", title)
-            }
+        fun initWebView(webView : WebView){
 
-            //Android 5.0+ Uploads
-            @SuppressLint("NewApi")
-            override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams?): Boolean {
-                if (mUploadMessage != null) {
-                    mUploadMessage!!.onReceiveValue(null)
+            webView.setWebChromeClient(object : WebChromeClient() {
+                override fun onCloseWindow(window: WebView) {
+                    onBackPressed()
+                    super.onCloseWindow(window)
                 }
-                Log.i("UPFILE", "file chooser params：" + fileChooserParams!!.toString())
-                //mUploadMessage = filePathCallback
-                val i = Intent(Intent.ACTION_GET_CONTENT)
-                i.addCategory(Intent.CATEGORY_OPENABLE)
 
-                Log.v("acceptType", fileChooserParams.acceptTypes[0].toString().toString())
-                if (fileChooserParams != null && fileChooserParams.acceptTypes != null
-                        && fileChooserParams.acceptTypes.size > 0) {
-                    i.type = fileChooserParams.acceptTypes[0]
-                    i.type = "*/*"
-                } else {
-                    i.type = "*/*"
+                override fun onReceivedTitle(view: WebView, title: String) {
+                    super.onReceivedTitle(view, title)
+                    Log.v("currWebViewTitle", title)
                 }
-                startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE)
-                return true
-            }
 
-            override fun onProgressChanged(view: WebView, progress: Int) {
-                if (progress < 100) {
-                    progLoading.visibility = ProgressBar.VISIBLE
-                    progLoading.progress = progress
-                } else if (progress >= 100) {
-                    progLoading.progress = progress
-                    try {
-                        Thread.sleep(300)
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
+                //Android 5.0+ Uploads
+                @SuppressLint("NewApi")
+                override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams?): Boolean {
+                    if (mUploadMessage != null) {
+                        mUploadMessage!!.onReceiveValue(null)
                     }
+                    Log.i("UPFILE", "file chooser params：" + fileChooserParams!!.toString())
+                    //mUploadMessage = filePathCallback
+                    val i = Intent(Intent.ACTION_GET_CONTENT)
+                    i.addCategory(Intent.CATEGORY_OPENABLE)
 
-                    //progLoading.setVisibility(ProgressBar.INVISIBLE);
-                    progLoading.progress = 0
-                    progLoading.visibility = ProgressBar.GONE
+                    Log.v("acceptType", fileChooserParams.acceptTypes[0].toString().toString())
+                    if (fileChooserParams != null && fileChooserParams.acceptTypes != null
+                            && fileChooserParams.acceptTypes.size > 0) {
+                        i.type = fileChooserParams.acceptTypes[0]
+                        i.type = "*/*"
+                    } else {
+                        i.type = "*/*"
+                    }
+                    startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE)
+                    return true
                 }
 
-            }
-        })
-        webView.setWebViewClient(object : WebViewClient() {
-            internal var loadingFinish: Boolean? = true
-            internal var redirectPage: Boolean? = false
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                loadingFinish = false
-                super.onPageStarted(view, url, favicon)
-                webView.requestFocus()
-                editText.setText(url)
-                if (url!!.indexOf("http:") >= 0 || url.indexOf("https:") >= 0) {
-                    //addToBack(url);
-                } else {
-                    back = true
-                    runToExternal(url)
-                    webView.loadUrl(backList[backList.size - 1].url)
-                }
-
-                var cm: String? = CookieManager.getInstance().getCookie(url)
-                if (cm == null) {
-                    cm = ""
-                }
-
-            }
-
-
-
-            fun addToBack(url: String, title: String) {
-                if (back) {
-                    back = false
-                } else {
-                    backList.add(0, Page(url, title))
-
-                }
-
-                //progLoading.setProgress(50);
-                if (backList.size >= 2) {
-                    try {
-
-
-                        while (backList[0] == backList[1]) {
-
-                            if (backList.size >= 2)
-                                backList.removeAt(0)
+                override fun onProgressChanged(view: WebView, progress: Int) {
+                    if (progress < 100) {
+                        progLoading.visibility = ProgressBar.VISIBLE
+                        progLoading.progress = progress
+                    } else if (progress >= 100) {
+                        progLoading.progress = progress
+                        try {
+                            Thread.sleep(300)
+                        } catch (e: InterruptedException) {
+                            e.printStackTrace()
                         }
-                    } catch (e: IndexOutOfBoundsException) {
-                        e.printStackTrace()
+
+                        //progLoading.setVisibility(ProgressBar.INVISIBLE);
+                        progLoading.progress = 0
+                        progLoading.visibility = ProgressBar.GONE
                     }
 
                 }
-            }
+            })
+            webView.setWebViewClient(object : WebViewClient() {
+                internal var loadingFinish: Boolean? = true
+                internal var redirectPage: Boolean? = false
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    loadingFinish = false
+                    super.onPageStarted(view, url, favicon)
+                    webView.requestFocus()
+                    editText.setText(url)
+                    if (url!!.indexOf("http:") >= 0 || url.indexOf("https:") >= 0) {
+                        //addToBack(url);
+                    } else {
+                        back = true
+                        runToExternal(url)
+                        webView.loadUrl(backList[backList.size - 1].url)
+                    }
 
-            override fun onPageFinished(view: WebView, url: String) : Unit{
-                super.onPageFinished(view, url)
-                if ((!redirectPage!!)) {
-                    loadingFinish = true
+                    var cm: String? = CookieManager.getInstance().getCookie(url)
+                    if (cm == null) {
+                        cm = ""
+                    }
+
                 }
 
-                if (loadingFinish!! && (!redirectPage!!)) {
-                    //HIDE LOADING IT HAS FINISHED
-                    //addToBack(url,view.getTitle());
-                    val hs = HistroySQLiteController(this@MainActivity)
-                    hs.addHistory(view.title, view.url)
-                } else {
-                    redirectPage = false
+
+
+                fun addToBack(url: String, title: String) {
+                    if (back) {
+                        back = false
+                    } else {
+                        backList.add(0, Page(url, title))
+
+                    }
+
+                    //progLoading.setProgress(50);
+                    if (backList.size >= 2) {
+                        try {
+
+
+                            while (backList[0] == backList[1]) {
+
+                                if (backList.size >= 2)
+                                    backList.removeAt(0)
+                            }
+                        } catch (e: IndexOutOfBoundsException) {
+                            e.printStackTrace()
+                        }
+
+                    }
                 }
 
-            }
+                override fun onPageFinished(view: WebView, url: String) : Unit{
+                    super.onPageFinished(view, url)
+                    if ((!redirectPage!!)) {
+                        loadingFinish = true
+                    }
 
-            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                Log.v("backListString", backList.toString())
-                if ((!loadingFinish!!)) {
-                    redirectPage = true
+                    if (loadingFinish!! && (!redirectPage!!)) {
+                        //HIDE LOADING IT HAS FINISHED
+                        //addToBack(url,view.getTitle());
+                        val hs = HistroySQLiteController(this@MainActivity)
+                        hs.addHistory(view.title, view.url)
+                    } else {
+                        redirectPage = false
+                    }
+
                 }
-                loadingFinish = false
-                view.loadUrl(url)
-                //addToBack(url);
 
-                return true
-            }
-        })
+                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                    Log.v("backListString", backList.toString())
+                    if ((!loadingFinish!!)) {
+                        redirectPage = true
+                    }
+                    loadingFinish = false
+                    view.loadUrl(url)
+                    //addToBack(url);
+
+                    return true
+                }
+            })
+        }
+        initWebView(findViewById(R.id.webView1) as WebViewOverride)
+        initWebView(findViewById(R.id.webView2) as WebViewOverride)
         hideKeybord()
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         val inUrl = intent.getStringExtra(getString(R.string.KEY_INURL_INTENT))
@@ -443,7 +456,8 @@ class MainActivity : AppCompatActivity() {
             loadUrlFromEditText()
 
         } else {
-            webView.loadUrl(homeUrl)
+            (findViewById(R.id.webView2) as WebViewOverride).loadUrl(homeUrl)
+            (findViewById(R.id.webView1) as WebViewOverride).loadUrl(homeUrl)
         }
         webView.settings.builtInZoomControls = true
         webView.settings.displayZoomControls = false
@@ -535,11 +549,31 @@ class MainActivity : AppCompatActivity() {
             exitDialog()
         } else if (id == R.id.menu_refresh) {
             loadUrlFromEditText()
+        }else if(id == R.id.menu_tab){
+            switchTab()
         }
 
         return super.onOptionsItemSelected(item)
     }
-
+    fun switchTab(){
+        if(!webviewBundleSaved){
+            webView = findViewById(R.id.webView2) as WebViewOverride
+            (findViewById(R.id.webView2) as WebViewOverride).visibility = View.VISIBLE
+            (findViewById(R.id.webView1) as WebViewOverride).visibility = View.GONE
+            editText.text = Editable.Factory.getInstance().newEditable(webView.url)
+            btnSwitchWebView.text = "2"
+            Toast.makeText(this,getString(R.string.multi_tab_turn_secondary_tab),Toast.LENGTH_SHORT).show()
+            webviewBundleSaved = !webviewBundleSaved
+        }else{
+            webView = findViewById(R.id.webView1) as WebViewOverride
+            (findViewById(R.id.webView1) as WebViewOverride).visibility = View.VISIBLE
+            (findViewById(R.id.webView2) as WebViewOverride).visibility = View.GONE
+            editText.text = Editable.Factory.getInstance().newEditable(webView.url)
+            Toast.makeText(this,getString(R.string.multi_tab_turn_primary_tab),Toast.LENGTH_SHORT).show()
+            btnSwitchWebView.text = "1"
+            webviewBundleSaved = !webviewBundleSaved
+        }
+    }
     fun hideKeybord() {
         val view = this.currentFocus
         if (view != null) {
