@@ -378,7 +378,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         back = true
                         runToExternal(url)
-                        webView.loadUrl(backList[backList.size - 1].url)
+                        //webView.loadUrl(webView.copyBackForwardList().currentItem.originalUrl)
                     }
 
                     var cm: String? = CookieManager.getInstance().getCookie(url)
@@ -416,8 +416,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onPageFinished(view: WebView, url: String) : Unit{
-                    super.onPageFinished(view, url)
-                    if ((!redirectPage!!)) {
+
+                    if (!redirectPage!!) {
                         loadingFinish = true
                     }
 
@@ -429,7 +429,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         redirectPage = false
                     }
-
+                    super.onPageFinished(view, url)
                 }
 
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
