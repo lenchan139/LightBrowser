@@ -23,17 +23,31 @@
         android:title="@string/menu_open_with"
         android:orderInCategory="100"
         app:showAsAction="never" />
-    <item android:id="@+id/menu_bookmarks"
-        android:title="@string/menu_ncbookmarks"
-        android:orderInCategory="100"
-        android:visible="true"
-        app:showAsAction="never" />
+
+    <item android:title="@string/menu_ncbookmarks"
+
+        android:orderInCategory="100">
+    <menu>
+        <item android:id="@+id/menu_add_NCBookmarks"
+           android:title="@string/menu_string_add_ncbookmark"
+           android:orderInCategory="100"
+           android:visible="true"
+           app:showAsAction="never" />
+
+        <item android:id="@+id/menu_view_ncbookmarks"
+            android:title="@string/menu_string_view_ncbookmarks"
+            android:orderInCategory="100"
+            android:visible="true"
+            app:showAsAction="never" />
+
+    </menu>
+    </item>
     <item android:id="@+id/menu_tab"
         android:title="@string/menu_switch_tab"
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
-    <item android:id="@+id/menu_add_bookmark"
+    <item android:id="@+id/menu_history"
         android:title="@string/menu_history"
         android:orderInCategory="100"
         android:visible="true"

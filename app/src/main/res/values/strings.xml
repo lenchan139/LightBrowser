@@ -27,4 +27,7 @@
     <string name="multi_tab_turn_secondary_tab">Turn to Secondary Tab.</string>
     <string name="multi_tab_turn_primary_tab">Turn to Primary Tab.</string>
     <string name="menu_switch_tab">Switch Tab</string>
+    <string name="menu_history_string">History</string>
+    <string name="menu_string_add_ncbookmark">Add NCBookmark</string>
+    <string name="menu_string_view_ncbookmarks">View NCBookmarks</string>
 </resources>

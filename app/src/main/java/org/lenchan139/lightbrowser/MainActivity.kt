@@ -4,11 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
@@ -57,6 +52,8 @@ import java.util.Objects
 
 import android.R.attr.data
 import android.R.attr.webViewStyle
+import android.content.*
+import android.support.annotation.RequiresApi
 import android.text.Editable
 import android.widget.ImageButton
 
@@ -216,8 +213,7 @@ class MainActivity : AppCompatActivity() {
         btnForward = findViewById(R.id.btnForward) as Button
         progLoading = findViewById(R.id.progressL) as ProgressBar
         settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        webView.settings.javaScriptEnabled = true
-        webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
+
         btnSwitchWebView = findViewById(R.id.btnSwitchView) as Button
         btnSwitchWebView.setOnClickListener {
             switchTab()
@@ -311,7 +307,8 @@ class MainActivity : AppCompatActivity() {
         editText.isFocusable = false
 
         fun initWebView(webView : WebView){
-
+            webView.settings.javaScriptEnabled = true
+            webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
             webView.setWebChromeClient(object : WebChromeClient() {
                 override fun onCloseWindow(window: WebView) {
                     onBackPressed()
@@ -524,16 +521,29 @@ class MainActivity : AppCompatActivity() {
             }
 
             return true
-        } else if (id == R.id.menu_add_bookmark) {
+        } else if (id == R.id.menu_history) {
             val intent = Intent(this, HistoryActivity::class.java)
             startActivity(intent)
 
-        } else if (id == R.id.menu_bookmarks) {
+        }else if(id == R.id.menu_add_NCBookmarks){
+            var launchIntent = Intent()
+            //launchIntent.addCategory("android.intent.category.LAUNCHER")
+            //launchIntent.setAction("org.lenchan139.ncbookmark.v2.addBookmarkAction")
+            launchIntent.setComponent(ComponentName("org.lenchan139.ncbookmark","org.lenchan139.ncbookmark.v2.AddBookmarkActivityV2"))
+            launchIntent.putExtra("inUrl",webView.url)
+            launchIntent.putExtra("inTitle",webView.title)
+            try {
+                startActivity(launchIntent)//null pointer check in case package name was not found
+            } catch (e: ActivityNotFoundException) {
+                e.printStackTrace()
+                Toast.makeText(this, "NCBookmark not installed!", Toast.LENGTH_SHORT).show()
+            }
+        } else if (id == R.id.menu_view_ncbookmarks) {
             val launchIntent = packageManager.getLaunchIntentForPackage("org.lenchan139.ncbookmark")
             try {
                 startActivity(launchIntent)//null pointer check in case package name was not found
             } catch (e: NullPointerException) {
-                Toast.makeText(this, "NCBookmark not installed!", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "NCBookmark not installed!", Toast.LENGTH_SHORT).show()
             }
 
             /*String url3 = settings.getString(commonStrings.TAG_pref_oc_bookmark_url(),"");

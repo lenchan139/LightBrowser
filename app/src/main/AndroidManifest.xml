@@ -47,7 +47,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".HistoryActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:label="@string/menu_history_string"/>
         <activity
             android:name=".SearchActivity"
             android:label="@string/title_activity_search"

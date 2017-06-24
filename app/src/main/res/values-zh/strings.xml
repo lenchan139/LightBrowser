@@ -25,4 +25,7 @@
     <string name="menu_switch_tab">切換分頁</string>
     <string name="multi_tab_turn_primary_tab">切換到主要分頁</string>
     <string name="multi_tab_turn_secondary_tab">切換到次要分頁</string>
+    <string name="menu_history_string">瀏覽歷史</string>
+    <string name="menu_string_add_ncbookmark">新增書籤</string>
+    <string name="menu_string_view_ncbookmarks">查看書籤</string>
 </resources>
