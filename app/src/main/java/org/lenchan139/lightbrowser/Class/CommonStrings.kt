@@ -42,6 +42,12 @@ class CommonStrings {
     fun TAG_pref_oc_bookmark_url(): String {
         return "org.lenchan139.lightbrowser.TAG_pref_oc_bookmark_url"
     }
+    fun TAG_pref_custom_user_agent(): String {
+        return "org.lenchan139.lightbrowser.TAG_pref_custom_user_agent"
+    }
+    fun TAG_pref_custom_user_agent_default(): String {
+        return "org.lenchan139.lightbrowser.TAG_pref_custom_user_agent_default"
+    }
 
     fun URL_DDG(): String {
         return "https://duckduckgo.com"

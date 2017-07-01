@@ -51,7 +51,6 @@ class SettingsLVAdpter(context: Context, private val svi: List<SettingsViewItem>
             holder = convertView.tag as SettingsViewHolder
         }
         val svi = getItem(position)
-        //0 = movie, 1 = title, 2 = nine
         val color_title = intArrayOf(Color.WHITE, Color.WHITE, Color.YELLOW)
         val color_time = intArrayOf(Color.WHITE, Color.WHITE, Color.YELLOW)
         val color_back = intArrayOf(Color.BLACK, Color.BLUE, Color.BLACK)

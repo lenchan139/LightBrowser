@@ -28,4 +28,8 @@
     <string name="menu_history_string">瀏覽歷史</string>
     <string name="menu_string_add_ncbookmark">新增書籤</string>
     <string name="menu_string_view_ncbookmarks">查看書籤</string>
+    <string name="find">搵…</string>
+    <string name="setting_string_custom_user_agent_title">自定義用戶代理</string>
+    <string name="setting_string_enter_hint">輸入你嘅用戶代理……</string>
+    <string name="string_pref_custom_user_agent">自定義用戶代理</string>
 </resources>

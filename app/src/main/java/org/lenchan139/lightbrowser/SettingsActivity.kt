@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.webkit.WebChromeClient
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.ListView
@@ -17,6 +18,7 @@ import android.widget.Toast
 
 import org.lenchan139.lightbrowser.Class.ClearableEditText
 import org.lenchan139.lightbrowser.Class.CommonStrings
+import org.lenchan139.lightbrowser.Class.WebViewOverride
 import org.lenchan139.lightbrowser.Settings.SettingsLVAdpter
 import org.lenchan139.lightbrowser.Settings.SettingsViewItem
 
@@ -48,7 +50,8 @@ class SettingsActivity : AppCompatActivity() {
         listSetting.clear()
         listSetting.add(SettingsViewItem(getString(R.string.setting_string_homepage), sp!!.getString(commonStrings.TAG_pref_home(), getString(R.string.setting_string_default)), null))
         listSetting.add(SettingsViewItem(getString(R.string.setting_string_fabbutton), sp!!.getString(commonStrings.TAG_pref_fab(), getString(R.string.setting_string_disabled)), null))
-        //listSetting.add(new SettingsViewItem("Owncloud Address",sp.getString(commonStrings.TAG_pref_oc_bookmark_url(),"Disabled"),null));
+        listSetting.add(SettingsViewItem(getString(R.string.string_pref_custom_user_agent), sp!!.getString(commonStrings.TAG_pref_custom_user_agent(), "Default"), null))
+
         listViewSetting!!.adapter = SettingsLVAdpter(this, listSetting)
 
         listViewSetting!!.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
@@ -57,7 +60,7 @@ class SettingsActivity : AppCompatActivity() {
             } else if (position == 1) {
                 onClickFabButton()
             } else if (position == 2) {
-                //onClickOCloudUrl();
+                onClickCustomUserAgent()
             }
             val o = listViewSetting!!.getItemAtPosition(position)
             val str = o as SettingsViewItem//As you are using Default String Adapter
@@ -98,39 +101,29 @@ class SettingsActivity : AppCompatActivity() {
                 .show()
     }
 
-    fun onClickOCloudUrl() {
+    fun onClickCustomUserAgent() {
         val txtUrl = ClearableEditText(this)
 
         // Set the default text to a link of the Queen
-        txtUrl.hint = "Enter your Owncloud Address ..."
+        txtUrl.hint = getString(R.string.setting_string_enter_hint)
         txtUrl.setText(sp!!.getString(commonStrings.TAG_pref_oc_bookmark_url(), null))
         txtUrl.setPadding(30, 15, 30, 15)
-        txtUrl.setSingleLine(true)
         txtUrl.imeOptions = EditorInfo.IME_ACTION_DONE
         AlertDialog.Builder(this)
-                .setTitle("Owncloud Address")
+                .setTitle(getString(R.string.setting_string_custom_user_agent_title))
                 //.setMessage("Enter new URL of homepage")
                 .setView(txtUrl)
-                .setPositiveButton("Apply") { dialog, whichButton ->
-                    var temp = txtUrl.text.toString()
+                .setNeutralButton(getString(R.string.setting_string_default), DialogInterface.OnClickListener { dialog, which ->
+                    sp!!.edit().remove(commonStrings.TAG_pref_custom_user_agent()).commit()
+                    Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_change),Toast.LENGTH_SHORT).show()
+                })
+                .setPositiveButton(getString(R.string.setting_string_apply)) { dialog, whichButton ->
+                    sp!!.edit().putString(commonStrings.TAG_pref_custom_user_agent(), txtUrl.text.toString()).commit()
+                    Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_change), Toast.LENGTH_SHORT).show()
 
-                    if (!temp.endsWith("/")) {
-                        temp = temp + "/"
-                    }
-
-                    if (!temp.startsWith("http") && !temp.contains(".")) {
-                        Toast.makeText(this@SettingsActivity, "Discard! Due to Invaild URL.", Toast.LENGTH_SHORT).show()
-                    } else if (!txtUrl.text.toString().startsWith("http")) {
-                        temp = "http://" + temp
-                        sp!!.edit().putString(commonStrings.TAG_pref_oc_bookmark_url(), txtUrl.text.toString()).commit()
-                        Toast.makeText(this@SettingsActivity, "Change saved.", Toast.LENGTH_SHORT).show()
-                    } else {
-                        sp!!.edit().putString(commonStrings.TAG_pref_oc_bookmark_url(), txtUrl.text.toString()).commit()
-                        Toast.makeText(this@SettingsActivity, "Change saved.", Toast.LENGTH_SHORT).show()
-                    }
                     initListView()
                 }
-                .setNegativeButton("Cancel") { dialog, whichButton -> }
+                .setNegativeButton(getString(R.string.setting_string_cancel)) { dialog, whichButton -> }
                 .show()
     }
 

@@ -19,8 +19,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutCompat
 import android.text.TextUtils
 import android.util.Log
-import android.view.KeyEvent
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.webkit.CookieManager
 import android.webkit.DownloadListener
@@ -29,16 +27,10 @@ import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.View
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.ProgressBar
-import android.widget.Toast
 
 import org.jsoup.Jsoup
 import org.lenchan139.lightbrowser.Class.*
@@ -52,10 +44,12 @@ import java.util.Objects
 
 import android.R.attr.data
 import android.R.attr.webViewStyle
+import android.app.Dialog
 import android.content.*
 import android.support.annotation.RequiresApi
 import android.text.Editable
-import android.widget.ImageButton
+import android.view.*
+import android.widget.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var  webView: WebViewOverride
@@ -199,8 +193,19 @@ class MainActivity : AppCompatActivity() {
     override fun onPostResume() {
         super.onPostResume()
         initFabButton()
+        reloadPreference()
     }
+    fun reloadPreference(){
+        //reload user agent
+        val wv1 = findViewById(R.id.webView1) as WebViewOverride
+        val uas1 = wv1.settings.userAgentString
+        wv1.settings.userAgentString = settings.getString(commonStrings.TAG_pref_custom_user_agent(),null)
+        val wv2 = findViewById(R.id.webView2) as WebViewOverride
+        val uas2 =wv2.settings.userAgentString
+        wv2.settings.userAgentString = settings.getString(commonStrings.TAG_pref_custom_user_agent()
+                ,settings.getString(commonStrings.TAG_pref_custom_user_agent_default(),null))
 
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -282,22 +287,7 @@ class MainActivity : AppCompatActivity() {
         // Example of a call to a native method
         //TextView tv = (TextView) findViewById(R.id.sample_text);
         //tv.setText(stringFromJNI());
-        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
-            val request = DownloadManager.Request(
-                    Uri.parse(url))
-            val cm = CookieManager.getInstance().getCookie(url)
-            request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) //Notify client once download is completed!
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "d_" + url.substring(url.lastIndexOf("/")))
-            request.addRequestHeader("Cookie", cm)
-            val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            dm.enqueue(request)
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT) //This is important!
-            intent.addCategory(Intent.CATEGORY_OPENABLE) //CATEGORY.OPENABLE
-            intent.type = "*/*"//any application,any extension
-            Toast.makeText(applicationContext, "Downloading...", //To notify the Client that the file is being downloaded
-                    Toast.LENGTH_LONG).show()
-        }
+
         editText.setOnClickListener {
             val intent = Intent(this@MainActivity, SearchActivity::class.java)
             intent.putExtra("para", editText.text.toString())
@@ -309,6 +299,34 @@ class MainActivity : AppCompatActivity() {
         fun initWebView(webView : WebView){
             webView.settings.javaScriptEnabled = true
             webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
+            settings.edit().putString(commonStrings.TAG_pref_custom_user_agent_default(),webView.settings.userAgentString).commit()
+            var default = webView.settings.userAgentString
+            webView.settings.userAgentString = settings.getString(commonStrings.TAG_pref_custom_user_agent(),default)
+
+            webView.setFindListener ( object : WebView.FindListener{
+                override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
+
+                }
+            }
+
+
+            )
+            webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+                val request = DownloadManager.Request(
+                        Uri.parse(url))
+                val cm = CookieManager.getInstance().getCookie(url)
+                request.allowScanningByMediaScanner()
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) //Notify client once download is completed!
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "d_" + url.substring(url.lastIndexOf("/")))
+                request.addRequestHeader("Cookie", cm)
+                val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                dm.enqueue(request)
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT) //This is important!
+                intent.addCategory(Intent.CATEGORY_OPENABLE) //CATEGORY.OPENABLE
+                intent.type = "*/*"//any application,any extension
+                Toast.makeText(applicationContext, "Downloading...", //To notify the Client that the file is being downloaded
+                        Toast.LENGTH_LONG).show()
+            }
             webView.setWebChromeClient(object : WebChromeClient() {
                 override fun onCloseWindow(window: WebView) {
                     onBackPressed()
@@ -561,9 +579,30 @@ class MainActivity : AppCompatActivity() {
             loadUrlFromEditText()
         }else if(id == R.id.menu_tab){
             switchTab()
+        }else if(id == R.id.menu_find){
+            findContent()
         }
 
         return super.onOptionsItemSelected(item)
+    }
+    fun findContent(){
+        val dialog = AlertDialog.Builder(this)
+        var editText = ClearableEditText(this)
+        editText.setHint("your keyword...")
+        editText.setSingleLine()
+        dialog.setView(editText)
+        dialog.setTitle("Find...")
+
+        dialog.setPositiveButton("Find", DialogInterface.OnClickListener { dialog, which ->
+            if(editText.text == null){
+
+            } else {
+            webView.findAllAsync(editText.text.toString())
+            }
+        })
+        dialog.setNegativeButton("Cancel",null)
+
+        dialog.create().show()
     }
     fun switchTab(){
         if(!webviewBundleSaved){

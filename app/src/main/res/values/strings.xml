@@ -30,4 +30,8 @@
     <string name="menu_history_string">History</string>
     <string name="menu_string_add_ncbookmark">Add NCBookmark</string>
     <string name="menu_string_view_ncbookmarks">View NCBookmarks</string>
+    <string name="find">Find...</string>
+    <string name="string_pref_custom_user_agent">Custom User Agent</string>
+    <string name="setting_string_custom_user_agent_title">Custom User Agent</string>
+    <string name="setting_string_enter_hint">Enter your User Agent ...</string>
 </resources>
