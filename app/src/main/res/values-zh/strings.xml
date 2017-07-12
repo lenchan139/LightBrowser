@@ -32,4 +32,10 @@
     <string name="setting_string_custom_user_agent_title">自定義用戶代理</string>
     <string name="setting_string_enter_hint">輸入你嘅用戶代理……</string>
     <string name="string_pref_custom_user_agent">自定義用戶代理</string>
+    <string name="common_string_array_pref_fab_0">停用</string>
+    <string name="common_string_array_pref_fab_1">主頁</string>
+    <string name="common_string_array_pref_fab_2">重整頁面</string>
+    <string name="common_string_array_pref_fab_3">共享</string>
+    <string name="common_string_array_sharing_format_0">鏈結（預設值）</string>
+    <string name="common_string_array_sharing_format_1">標題 + 鏈結</string>
 </resources>

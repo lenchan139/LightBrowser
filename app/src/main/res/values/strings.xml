@@ -22,7 +22,7 @@
     <string name="setting_string_apply">Apply</string>
     <string name="setting_string_cancel">Cancel</string>
     <string name="setting_string_fabbutton_mode">Fab button mode</string>
-    <string name="setting_string_save_turn_to">Saved! Now turn to</string>
+    <string name="setting_string_save_turn_to">"Saved! Now turn to: "</string>
     <string name="setting_activity">Settings</string>
     <string name="multi_tab_turn_secondary_tab">Turn to Secondary Tab.</string>
     <string name="multi_tab_turn_primary_tab">Turn to Primary Tab.</string>
@@ -34,4 +34,10 @@
     <string name="string_pref_custom_user_agent">Custom User Agent</string>
     <string name="setting_string_custom_user_agent_title">Custom User Agent</string>
     <string name="setting_string_enter_hint">Enter your User Agent ...</string>
+    <string name="common_string_array_pref_fab_0">Disable</string>
+    <string name="common_string_array_pref_fab_1">Home</string>
+    <string name="common_string_array_pref_fab_2">Refresh</string>
+    <string name="common_string_array_pref_fab_3">Share</string>
+    <string name="common_string_array_sharing_format_0">Link (default)</string>
+    <string name="common_string_array_sharing_format_1">Title + Link</string>
 </resources>

@@ -28,9 +28,10 @@ import java.util.Objects
 class SettingsActivity : AppCompatActivity() {
     private var listViewSetting: ListView? = null
     internal var listSetting: MutableList<SettingsViewItem> = ArrayList()
-    internal var commonStrings = CommonStrings()
+    internal lateinit var commonStrings : CommonStrings
     private var sp: SharedPreferences? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+        commonStrings = CommonStrings(applicationContext)
         val ocl: View.OnClickListener? = null
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -50,7 +51,8 @@ class SettingsActivity : AppCompatActivity() {
         listSetting.clear()
         listSetting.add(SettingsViewItem(getString(R.string.setting_string_homepage), sp!!.getString(commonStrings.TAG_pref_home(), getString(R.string.setting_string_default)), null))
         listSetting.add(SettingsViewItem(getString(R.string.setting_string_fabbutton), sp!!.getString(commonStrings.TAG_pref_fab(), getString(R.string.setting_string_disabled)), null))
-        listSetting.add(SettingsViewItem(getString(R.string.string_pref_custom_user_agent), sp!!.getString(commonStrings.TAG_pref_custom_user_agent(), "Default"), null))
+        listSetting.add(SettingsViewItem(getString(R.string.string_pref_custom_user_agent), sp!!.getString(commonStrings.TAG_pref_custom_user_agent(), getString(R.string.setting_string_default)), null))
+        listSetting.add(SettingsViewItem("Sharing Format", sp!!.getString(commonStrings.TAG_pref_sharing_format_string(), CommonStrings(applicationContext).ARRAY_pref_Sharing_Format()[0]), null))
 
         listViewSetting!!.adapter = SettingsLVAdpter(this, listSetting)
 
@@ -61,6 +63,8 @@ class SettingsActivity : AppCompatActivity() {
                 onClickFabButton()
             } else if (position == 2) {
                 onClickCustomUserAgent()
+            }else if(position == 3){
+                onClickSharingFormat()
             }
             val o = listViewSetting!!.getItemAtPosition(position)
             val str = o as SettingsViewItem//As you are using Default String Adapter
@@ -149,4 +153,20 @@ class SettingsActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    fun onClickSharingFormat() {
+        val items = commonStrings.ARRAY_pref_Sharing_Format()
+
+        var oldPos =  sp!!.getInt(commonStrings.TAG_pref_sharing_format_int(), 0)
+
+        val dialog = AlertDialog.Builder(this).setTitle("Sharing Format").setIcon(R.mipmap.ic_launcher)
+                .setSingleChoiceItems(items, oldPos) { dialog, which ->
+                    sp!!.edit().putInt(commonStrings.TAG_pref_sharing_format_int(), which).apply()
+                    sp!!.edit().putString(commonStrings.TAG_pref_sharing_format_string(), items[which]).apply()
+                    Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_turn_to) + sp!!.getString(commonStrings.TAG_pref_sharing_format_string(), null) + "!", Toast.LENGTH_SHORT).show()
+
+                    dialog.dismiss()
+                    initListView()
+                }.create()
+        dialog.show()
+    }
 }

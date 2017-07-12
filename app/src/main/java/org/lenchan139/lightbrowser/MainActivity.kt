@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnForward: Button
     private lateinit var editText: ClearableEditText
     private lateinit var settings: SharedPreferences
-    private var commonStrings = CommonStrings()
+    private lateinit var commonStrings : CommonStrings
     private var backList = ArrayList<Page>()
     private var back = false
     private lateinit var progLoading: ProgressBar
@@ -211,6 +211,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
+        commonStrings = CommonStrings(applicationContext)
         webView = findViewById(R.id.webView1) as WebViewOverride
         btnGo = findViewById(R.id.btnGo) as Button
         editText = findViewById(R.id.editText) as ClearableEditText
@@ -506,8 +507,15 @@ class MainActivity : AppCompatActivity() {
     fun shareCurrPage() {
 
         val sendIntent = Intent()
+        var sfType = settings.getInt(CommonStrings(baseContext).TAG_pref_sharing_format_int(),0)
+        var  sfContent = ""
+        if(sfType == 0){
+            sfContent = webView.url
+        }else if(sfType == 1){
+            sfContent = webView.title + "\n" + webView.url
+        }
         sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_TEXT, webView.url)
+        sendIntent.putExtra(Intent.EXTRA_TEXT, sfContent)
         sendIntent.type = "text/plain"
         startActivity(Intent.createChooser(sendIntent, "Send to..."))
     }
