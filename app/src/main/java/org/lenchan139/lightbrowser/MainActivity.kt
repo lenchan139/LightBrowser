@@ -63,14 +63,20 @@ class MainActivity : AppCompatActivity() {
     private var back = false
     private lateinit var progLoading: ProgressBar
     private lateinit var homeUrl: String
-    private var mUploadMessage: ValueCallback<Any?>? = null
+    private var mUploadMessage: ValueCallback<Array<Uri>>? = null
     private var webviewBundleSaved = false
-    private var webviewBundle : Bundle = Bundle()
     private lateinit var btnSwitchWebView : Button
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        //super.onActivityResult(requestCode, resultCode, data)
+        Log.i("here123","before")
         if (requestCode == FILECHOOSER_RESULTCODE) {
-            if (null == mUploadMessage) return
+        Log.i("here123","after")
+            if (null == mUploadMessage)
+            {
+                //mUploadMessage!!.onReceiveValue(null)
+                return
+            }
             val result = if (data == null || resultCode != Activity.RESULT_OK) null else data.data
             if (result == null) {
                 mUploadMessage!!.onReceiveValue(null)
@@ -78,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                 return
             }
 
-            //CLog.i("UPFILE", "onActivityResult" + result.toString());
+            Log.i("UPFILE", "onActivityResult" + result.toString());
             val path = FileUtils.getPath(this, result)
             if (TextUtils.isEmpty(path)) {
                 mUploadMessage!!.onReceiveValue(null)
@@ -86,11 +92,11 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             val uri = Uri.fromFile(File(path!!))
-            ///CLog.i("UPFILE", "onActivityResult after parser uri:" + uri.toString());
+            Log.i("UPFILE", "onActivityResult after parser uri:" + uri.toString());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mUploadMessage!!.onReceiveValue(arrayOf(uri))
             } else {
-                mUploadMessage!!.onReceiveValue(uri)
+                mUploadMessage!!.onReceiveValue(null)
             }
             mUploadMessage = null
         }
@@ -339,18 +345,16 @@ class MainActivity : AppCompatActivity() {
                     Log.v("currWebViewTitle", title)
                 }
 
-                //Android 5.0+ Uploads
-                @SuppressLint("NewApi")
-                override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams?): Boolean {
+                override fun onShowFileChooser(webView: WebView?, filePathCallback: ValueCallback<Array<Uri>>?, fileChooserParams: FileChooserParams?): Boolean {
                     if (mUploadMessage != null) {
                         mUploadMessage!!.onReceiveValue(null)
                     }
                     Log.i("UPFILE", "file chooser params：" + fileChooserParams!!.toString())
-                    //mUploadMessage = filePathCallback
+                    mUploadMessage = filePathCallback
                     val i = Intent(Intent.ACTION_GET_CONTENT)
                     i.addCategory(Intent.CATEGORY_OPENABLE)
 
-                    Log.v("acceptType", fileChooserParams.acceptTypes[0].toString().toString())
+                    Log.v("acceptType", fileChooserParams.acceptTypes[0].toString())
                     if (fileChooserParams != null && fileChooserParams.acceptTypes != null
                             && fileChooserParams.acceptTypes.size > 0) {
                         i.type = fileChooserParams.acceptTypes[0]
@@ -360,6 +364,11 @@ class MainActivity : AppCompatActivity() {
                     }
                     startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE)
                     return true
+                }
+
+                //Android 5.0+ Uploads
+                 fun onShowFileChooser1(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams?): Boolean {
+                   return false
                 }
 
                 override fun onProgressChanged(view: WebView, progress: Int) {
@@ -690,6 +699,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val FILECHOOSER_RESULTCODE = 1
+        private val FILECHOOSER_RESULTCODE = 859
     }
 }
