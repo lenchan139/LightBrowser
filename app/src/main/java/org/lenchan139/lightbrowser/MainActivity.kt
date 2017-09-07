@@ -656,8 +656,9 @@ class MainActivity : AppCompatActivity() {
             webView.loadUrl(temp)
         } else if (temp.indexOf(":") >= 1) {
             runToExternal(temp)
-        } else if (!temp.contains(".")) {
-            webView.loadUrl(commonStrings.searchHeader() + temp)
+        } else if (!(temp.contains(".") && !temp.contains(" "))) {
+            webView.loadUrl(settings.getString(commonStrings.TAG_pref_Search_Engine_Url(),
+                    commonStrings.ARRAY_pref_Search_Engine_Default().get(0).url).replace("!@keywoard",temp))
         } else {
             webView.loadUrl("http://" + temp)
         }

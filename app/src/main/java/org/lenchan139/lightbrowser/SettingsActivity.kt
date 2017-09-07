@@ -53,6 +53,7 @@ class SettingsActivity : AppCompatActivity() {
         listSetting.add(SettingsViewItem(getString(R.string.setting_string_fabbutton), sp!!.getString(commonStrings.TAG_pref_fab(), getString(R.string.setting_string_disabled)), null))
         listSetting.add(SettingsViewItem(getString(R.string.string_pref_custom_user_agent), sp!!.getString(commonStrings.TAG_pref_custom_user_agent(), getString(R.string.setting_string_default)), null))
         listSetting.add(SettingsViewItem("Sharing Format", sp!!.getString(commonStrings.TAG_pref_sharing_format_string(), CommonStrings(applicationContext).ARRAY_pref_Sharing_Format()[0]), null))
+        listSetting.add(SettingsViewItem("Search Engine", sp!!.getString(commonStrings.TAG_pref_Search_Engine_Name(),commonStrings.ARRAY_pref_Search_Engine_Default().get(0).name) , null))
 
         listViewSetting!!.adapter = SettingsLVAdpter(this, listSetting)
 
@@ -65,6 +66,8 @@ class SettingsActivity : AppCompatActivity() {
                 onClickCustomUserAgent()
             }else if(position == 3){
                 onClickSharingFormat()
+            }else if(position == 4){
+                onClickSearchEngine()
             }
             val o = listViewSetting!!.getItemAtPosition(position)
             val str = o as SettingsViewItem//As you are using Default String Adapter
@@ -169,4 +172,51 @@ class SettingsActivity : AppCompatActivity() {
                 }.create()
         dialog.show()
     }
-}
+    fun onClickSearchEngine(){
+        val preIitems = commonStrings.ARRAY_pref_Search_Engine_Default()
+        var items : Array<String> = Array<String>(preIitems.count()){""}
+
+        for ((i,preItem) in preIitems.withIndex()) {
+            items[i] = preItem.name
+        }
+
+
+
+        val dialog = AlertDialog.Builder(this).setTitle("Search Engine").setIcon(R.mipmap.ic_launcher)
+                .setSingleChoiceItems(items, -1) { dialog, which ->
+                    sp!!.edit().putString(commonStrings.TAG_pref_Search_Engine_Url(), preIitems[which].url).apply()
+                    sp!!.edit().putString(commonStrings.TAG_pref_Search_Engine_Name(), preIitems[which].name).apply()
+                    Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_turn_to) + sp!!.getString(commonStrings.TAG_pref_Search_Engine_Url(), null) + "!", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    initListView()
+                }.setNeutralButton("Custom...") { dialog, whichButton ->
+                         val txtUrl = ClearableEditText(this)
+                         // Set the default text to a link of the Queen
+                        txtUrl.hint = "Enter your search engine url..."
+                        txtUrl.setText(sp!!.getString(commonStrings.TAG_pref_Search_Engine_Url(), null))
+                        txtUrl.setPadding(30, 15, 30, 15)
+                        txtUrl.setSingleLine(true)
+                        txtUrl.imeOptions = EditorInfo.IME_ACTION_DONE
+                          AlertDialog.Builder(this)
+                            .setTitle("Custom Search Engine")
+                            .setMessage("Enter your search engine url with !@keyword for replacing")
+                            .setView(txtUrl)
+                            .setPositiveButton(getString(R.string.setting_string_apply)) { dialog, whichButton ->
+                                sp!!.edit().putString(commonStrings.TAG_pref_Search_Engine_Url(), txtUrl.text.toString()).commit()
+                                sp!!.edit().putString(commonStrings.TAG_pref_Search_Engine_Name(), "Custom: " + txtUrl.text.toString()).commit()
+                                Toast.makeText(this@SettingsActivity, getString(R.string.setting_string_save_change), Toast.LENGTH_SHORT).show()
+
+                                initListView()
+                            }
+                            .setNegativeButton(getString(R.string.setting_string_cancel)) { dialog, whichButton -> }
+                            .show()
+
+                     }
+
+
+                .create()
+            dialog.show()
+        }
+    }
+
+

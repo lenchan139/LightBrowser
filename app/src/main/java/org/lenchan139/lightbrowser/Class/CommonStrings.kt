@@ -41,8 +41,13 @@ class CommonStrings constructor(context:Context) {
                         context.getString(R.string.common_string_array_pref_fab_3))
     }
     fun ARRAY_pref_Sharing_Format(): Array<String> {
-        return arrayOf( context.getString(R.string.common_string_array_sharing_format_0), 
-                        context.getString(R.string.common_string_array_sharing_format_1))
+        return arrayOf( context.getString(R.string.common_string_array_sharing_format_0),
+                context.getString(R.string.common_string_array_sharing_format_1))
+    }
+
+    fun ARRAY_pref_Search_Engine_Default(): Array<SearchEngineItem> {
+        return arrayOf( SearchEngineItem("DuckDuckGo","https://duckduckgo.com/?q=!@keywoard"),
+                        SearchEngineItem("Google","https://www.google.com/search?q=!@keywoard"))
     }
 
     fun STR_INTENT_MainToSetting(): String {
@@ -64,8 +69,16 @@ class CommonStrings constructor(context:Context) {
     fun TAG_pref_sharing_format_string(): String {
         return "org.lenchan139.lightbrowser.TAG_pref_sharing_format_string"
     }
+    fun TAG_pref_Search_Engine_Url(): String {
+        return "org.lenchan139.lightbrowser.TAG_pref_Search_Engine_Url"
+    }
+
+    fun TAG_pref_Search_Engine_Name(): String {
+        return "org.lenchan139.lightbrowser.TAG_pref_Search_Engine_Name"
+    }
 
     fun URL_DDG(): String {
         return "https://duckduckgo.com"
     }
+    class SearchEngineItem(val name: String, val url: String)
 }
