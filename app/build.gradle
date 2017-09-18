@@ -8,8 +8,8 @@ android {
         applicationId "org.lenchan139.lightbrowser"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 36
-        versionName 'v36'
+        versionCode 37
+        versionName 'v37'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -47,6 +47,7 @@ import android.R.attr.webViewStyle
 import android.app.Dialog
 import android.content.*
 import android.support.annotation.RequiresApi
+import android.support.v4.media.MediaBrowserCompat
 import android.text.Editable
 import android.view.*
 import android.widget.*
@@ -494,7 +495,8 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun runToExternal(url: String) {
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val preIntent = Intent(Intent.ACTION_VIEW,Uri.parse(url))
+        var browserIntent = Intent.createChooser(preIntent,"Open with...")
         try {
             startActivity(browserIntent)
         } catch (e: ActivityNotFoundException) {
@@ -548,12 +550,7 @@ class MainActivity : AppCompatActivity() {
             shareCurrPage()
             return true
         } else if (id == R.id.menu_external) {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(webView.url))
-            try {
-                startActivity(browserIntent)
-            } catch (e: ActivityNotFoundException) {
-                Toast.makeText(this, "No handler.", Toast.LENGTH_SHORT).show()
-            }
+            runToExternal(webView.url)
 
             return true
         } else if (id == R.id.menu_history) {
@@ -650,9 +647,11 @@ class MainActivity : AppCompatActivity() {
 
     fun loadUrlFromEditText() {
         val temp = editText.text.toString().trim { it <= ' ' }
-        if (false) {
+        if (temp.startsWith("javascript:")) {
             webView.loadUrl(temp)
-        } else if (temp.indexOf("https://") == 0 || temp.indexOf("http://") == 0) {
+            editText.setText(webView.url)
+
+        } else if (temp.startsWith("https://") || temp.startsWith("http://")) {
             webView.loadUrl(temp)
         } else if (temp.indexOf(":") >= 1) {
             runToExternal(temp)
