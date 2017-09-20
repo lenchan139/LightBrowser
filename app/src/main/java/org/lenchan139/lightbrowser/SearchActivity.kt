@@ -5,16 +5,13 @@ import android.content.Intent
 import android.database.sqlite.SQLiteException
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
@@ -22,16 +19,14 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListView
 
-import org.droidparts.contract.SQL
-import org.lenchan139.lightbrowser.History.HistoryItem
+import org.lenchan139.lightbrowser.History.CustomScriptItem
 import org.lenchan139.lightbrowser.History.HistroySQLiteController
-import org.lenchan139.lightbrowser.R
 
 import java.util.ArrayList
 
 class SearchActivity : AppCompatActivity() {
     private var histroySQLiteController: HistroySQLiteController? = null
-    internal var historyList = ArrayList<HistoryItem>()
+    internal var historyList = ArrayList<CustomScriptItem>()
     internal lateinit var hList: ListView
     internal lateinit var editText: EditText
 

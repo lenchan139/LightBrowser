@@ -4,20 +4,18 @@ import android.content.Intent
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 
-import org.lenchan139.lightbrowser.History.HistoryItem
+import org.lenchan139.lightbrowser.History.CustomScriptItem
 import org.lenchan139.lightbrowser.History.HistroySQLiteController
 
 import java.util.ArrayList
 
 class HistoryActivity : AppCompatActivity() {
     private var histroySQLiteController: HistroySQLiteController? = null
-    internal lateinit var historyList: ArrayList<HistoryItem>
+    internal lateinit var historyList: ArrayList<CustomScriptItem>
     internal lateinit var hList: ListView
     internal lateinit var fab: FloatingActionButton
     override fun onCreate(savedInstanceState: Bundle?) {

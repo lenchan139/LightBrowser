@@ -51,6 +51,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.text.Editable
 import android.view.*
 import android.widget.*
+import org.lenchan139.lightbrowser.CustomScript.CustomScriptUtil
 
 class MainActivity : AppCompatActivity() {
     private lateinit var  webView: WebViewOverride
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     private var mUploadMessage: ValueCallback<Array<Uri>>? = null
     private var webviewBundleSaved = false
     private lateinit var btnSwitchWebView : Button
-
+    private var isWebViewInitDone = false
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //super.onActivityResult(requestCode, resultCode, data)
         Log.i("here123","before")
@@ -416,35 +417,12 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                fun addToBack(url: String, title: String) {
-                    if (back) {
-                        back = false
-                    } else {
-                        backList.add(0, Page(url, title))
-
-                    }
-
-                    //progLoading.setProgress(50);
-                    if (backList.size >= 2) {
-                        try {
-
-
-                            while (backList[0] == backList[1]) {
-
-                                if (backList.size >= 2)
-                                    backList.removeAt(0)
-                            }
-                        } catch (e: IndexOutOfBoundsException) {
-                            e.printStackTrace()
-                        }
-
-                    }
-                }
-
+                var isInitDone = false
                 override fun onPageFinished(view: WebView, url: String) : Unit{
 
                     if (!redirectPage!!) {
                         loadingFinish = true
+
                     }
 
                     if (loadingFinish!! && (!redirectPage!!)) {
@@ -452,9 +430,19 @@ class MainActivity : AppCompatActivity() {
                         //addToBack(url,view.getTitle());
                         val hs = HistroySQLiteController(this@MainActivity)
                         hs.addHistory(view.title, view.url)
+
+                        //runCustomScript(s)
+                        val runscripts = CustomScriptUtil().getScriptsToRun(baseContext,url)
+                        if(runscripts.size > 0 && isInitDone){
+                            for(i in runscripts){
+                                view.evaluateJavascript(i,null)
+                            }
+                        }
+                        isInitDone = true
                     } else {
                         redirectPage = false
                     }
+
                     super.onPageFinished(view, url)
                 }
 
@@ -496,7 +484,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun runToExternal(url: String) {
         val preIntent = Intent(Intent.ACTION_VIEW,Uri.parse(url))
-        var browserIntent = Intent.createChooser(preIntent,"Open with...")
+        val browserIntent = Intent.createChooser(preIntent,"Open with...")
+        // Verify it resolves
+        val activities = packageManager.queryIntentActivities(preIntent, 0)
+
+        for(i in activities) {
+            Log.v("listExternalActivity", i.activityInfo.name)
+        }
         try {
             startActivity(browserIntent)
         } catch (e: ActivityNotFoundException) {
@@ -595,9 +589,14 @@ class MainActivity : AppCompatActivity() {
             switchTab()
         }else if(id == R.id.menu_find){
             findContent()
+        }else if(id == R.id.menu_custom_script){
+            openCustomScriptActivity()
         }
-
         return super.onOptionsItemSelected(item)
+    }
+    fun openCustomScriptActivity(){
+        val intent = Intent(this,CustomScriptActivity::class.java)
+        startActivity(intent)
     }
     fun findContent(){
         val dialog = AlertDialog.Builder(this)

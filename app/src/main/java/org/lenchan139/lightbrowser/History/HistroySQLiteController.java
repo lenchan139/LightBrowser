@@ -1,6 +1,5 @@
 package org.lenchan139.lightbrowser.History;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,7 +8,6 @@ import android.util.Log;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -40,8 +38,8 @@ public class HistroySQLiteController {
         db.execSQL(sqlInsert);
         db.close();
     }
-    public ArrayList<HistoryItem> getHistory(){
-        ArrayList<HistoryItem> result = new ArrayList<HistoryItem>();
+    public ArrayList<CustomScriptItem> getHistory(){
+        ArrayList<CustomScriptItem> result = new ArrayList<CustomScriptItem>();
         SQLiteDatabase db = historySQLiteHelper.getReadableDatabase();
         final String sqlSelct = "SELECT * FROM " + historySQLiteHelper.get_TableName() + " ORDER BY _id DESC";
         Cursor cursor = null;
@@ -49,16 +47,16 @@ public class HistroySQLiteController {
         Log.v("ss", String.valueOf(cursor.getCount()));
         if(cursor.moveToFirst()){
             do {
-                result.add(new HistoryItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)));
-                Log.v("status",new HistoryItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)).toString());
+                result.add(new CustomScriptItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)));
+                Log.v("status",new CustomScriptItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)).toString());
             } while(cursor.moveToNext());
         }
         cursor.close();
         return  result;
     }
-    public ArrayList<HistoryItem> getHistoryBySearchUrl(String keyword){
+    public ArrayList<CustomScriptItem> getHistoryBySearchUrl(String keyword){
         keyword.replace(" ","%");
-        ArrayList<HistoryItem> result = new ArrayList<HistoryItem>();
+        ArrayList<CustomScriptItem> result = new ArrayList<CustomScriptItem>();
         SQLiteDatabase db = historySQLiteHelper.getReadableDatabase();
         String sqlSelct = "SELECT * FROM " + historySQLiteHelper.get_TableName() +
                 " WHERE _url LIKE \"%" + keyword + "%\"" +
@@ -73,8 +71,8 @@ public class HistroySQLiteController {
         Log.v("ss", String.valueOf(cursor.getCount()));
         if(cursor.moveToFirst()){
             do {
-                result.add(new HistoryItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)));
-                Log.v("status",new HistoryItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)).toString());
+                result.add(new CustomScriptItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)));
+                Log.v("status",new CustomScriptItem(cursor.getString(1),cursor.getString(2),cursor.getString(3)).toString());
             } while(cursor.moveToNext());
         }
         cursor.close();

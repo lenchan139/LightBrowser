@@ -19,11 +19,6 @@
                 android:orderInCategory="100"
                 app:showAsAction="never" />
 
-    <item android:id="@+id/menu_find"
-        android:title="@string/find"
-        android:orderInCategory="100"
-        android:visible="true"
-        app:showAsAction="never" />
     <item android:id="@+id/menu_external"
         android:title="@string/menu_open_with"
         android:orderInCategory="100"
@@ -60,6 +55,22 @@
         android:visible="true"
         app:showAsAction="never" />
 
+    <item android:title="Tools"
+
+        android:orderInCategory="100">
+        <menu>
+            <item android:id="@+id/menu_find"
+                android:title="@string/find"
+                android:orderInCategory="100"
+                android:visible="true"
+                app:showAsAction="never" />
+            <item android:id="@+id/menu_custom_script"
+                android:title="Custom Script"
+                android:orderInCategory="100"
+                android:visible="true"
+                app:showAsAction="never" />
+        </menu>
+    </item>
     <item android:id="@+id/action_settings"
         android:title="@string/menu_settings"
         android:orderInCategory="100"

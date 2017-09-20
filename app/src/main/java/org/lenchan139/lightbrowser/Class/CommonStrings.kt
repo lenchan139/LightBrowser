@@ -80,5 +80,13 @@ class CommonStrings constructor(context:Context) {
     fun URL_DDG(): String {
         return "https://duckduckgo.com"
     }
+    fun TAG_custom_script_isEdit():String{
+        return "TAG_custom_script_isEdit"
+    }
+
+    fun TAG_custom_script_editTitle():String{
+        return "TAG_custom_script_editTitle"
+    }
+
     class SearchEngineItem(val name: String, val url: String)
 }
