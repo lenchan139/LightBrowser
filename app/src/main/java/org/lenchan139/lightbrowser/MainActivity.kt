@@ -484,18 +484,29 @@ class MainActivity : AppCompatActivity() {
 
     private fun runToExternal(url: String) {
         val preIntent = Intent(Intent.ACTION_VIEW,Uri.parse(url))
+        val targetedShareIntents = ArrayList<Intent>()
         val browserIntent = Intent.createChooser(preIntent,"Open with...")
-        // Verify it resolves
-        val activities = packageManager.queryIntentActivities(preIntent, 0)
+        val resInfo = packageManager.queryIntentActivities(preIntent, PackageManager.MATCH_ALL)
 
-        for(i in activities) {
-            Log.v("listExternalActivity", i.activityInfo.name)
+        for (resolveInfo in resInfo){
+            Log.v("listV",resolveInfo.activityInfo.packageName)
+            val packageName = resolveInfo.activityInfo.packageName
+            val targetedShareIntent = Intent(Intent.ACTION_VIEW,Uri.parse(url))
+            targetedShareIntent.setPackage(packageName)
+            if(!packageName.contains("org.lenchan139.lightbrowser")){
+                targetedShareIntents.add(targetedShareIntent)
+                Log.v("listVTureFalse","True")
+            }
         }
-        try {
-            startActivity(browserIntent)
-        } catch (e: ActivityNotFoundException) {
-            e.printStackTrace()
-            Toast.makeText(this, "No Handler here.", Toast.LENGTH_SHORT).show()
+        if(targetedShareIntents.size > 0 ) {
+            val chooserIntent = Intent.createChooser(
+                    targetedShareIntents.removeAt(targetedShareIntents.size - 1), "Open with...")
+
+            chooserIntent.putExtra(
+                    Intent.EXTRA_INITIAL_INTENTS, JavaUtils().listToPracelable(targetedShareIntents))
+            startActivity(chooserIntent)
+        }else{
+            Toast.makeText(this,"No Handler here.",Toast.LENGTH_SHORT).show()
         }
 
     }
