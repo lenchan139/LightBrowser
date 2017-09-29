@@ -498,13 +498,24 @@ class MainActivity : AppCompatActivity() {
                 Log.v("listVTureFalse","True")
             }
         }
-        if(targetedShareIntents.size > 0 ) {
+        if(targetedShareIntents.size > 1 ) {
             val chooserIntent = Intent.createChooser(
                     targetedShareIntents.removeAt(targetedShareIntents.size - 1), "Open with...")
 
             chooserIntent.putExtra(
                     Intent.EXTRA_INITIAL_INTENTS, JavaUtils().listToPracelable(targetedShareIntents))
             startActivity(chooserIntent)
+        }else if(targetedShareIntents.size == 1) {
+            val dialog = AlertDialog.Builder(this)
+            val theIntent = packageManager.queryIntentActivities(targetedShareIntents.get(0), 0).get(0)
+            dialog.setTitle("Open in " + theIntent.loadLabel(packageManager) + " ?")
+                    .setIcon(theIntent.loadIcon(packageManager))
+                    .setNegativeButton("Cancel" , DialogInterface.OnClickListener { dialogInterface, i ->
+
+                    })
+                    .setPositiveButton("Go!", DialogInterface.OnClickListener { dialogInterface, i ->
+                        startActivity(targetedShareIntents.get(0))
+                    }).create().show()
         }else{
             Toast.makeText(this,"No Handler here.",Toast.LENGTH_SHORT).show()
         }
