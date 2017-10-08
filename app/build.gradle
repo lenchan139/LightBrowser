@@ -8,8 +8,8 @@ android {
         applicationId "org.lenchan139.lightbrowser"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 40
-        versionName 'v40'
+        versionCode 41
+        versionName 'v41'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -33,8 +33,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'org.droidparts:droidparts:2.9.7'
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

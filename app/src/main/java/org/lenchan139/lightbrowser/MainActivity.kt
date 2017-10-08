@@ -20,13 +20,6 @@ import android.support.v7.widget.LinearLayoutCompat
 import android.text.TextUtils
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
-import android.webkit.CookieManager
-import android.webkit.DownloadListener
-import android.webkit.ValueCallback
-import android.webkit.WebBackForwardList
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -50,14 +43,14 @@ import android.support.annotation.RequiresApi
 import android.support.v4.media.MediaBrowserCompat
 import android.text.Editable
 import android.view.*
+import android.webkit.*
 import android.widget.*
+import kotlinx.android.synthetic.main.content_main.*
 import org.lenchan139.lightbrowser.CustomScript.CustomScriptUtil
 
 class MainActivity : AppCompatActivity() {
     private lateinit var  webView: WebViewOverride
     private lateinit var btnGo: Button
-    private lateinit var btnBack: Button
-    private lateinit var btnForward: Button
     private lateinit var editText: ClearableEditText
     private lateinit var settings: SharedPreferences
     private lateinit var commonStrings : CommonStrings
@@ -221,12 +214,10 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         commonStrings = CommonStrings(applicationContext)
         webView = findViewById(R.id.webView1) as WebViewOverride
-        btnGo = findViewById(R.id.btnGo) as Button
         editText = findViewById(R.id.editText) as ClearableEditText
-        btnBack = findViewById(R.id.btnBack) as Button
-        btnForward = findViewById(R.id.btnForward) as Button
         progLoading = findViewById(R.id.progressL) as ProgressBar
         settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        btnGo = findViewById(R.id.btnGo) as Button
 
         btnSwitchWebView = findViewById(R.id.btnSwitchView) as Button
         btnSwitchWebView.setOnClickListener {
@@ -238,9 +229,6 @@ class MainActivity : AppCompatActivity() {
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { callFabButton() }
         initFabButton()
-        btnGo.visibility = View.GONE
-        btnBack.visibility = View.GONE
-        btnForward.visibility = View.GONE
 
         //permission reqeuest
         // Here, thisActivity is the current activity
@@ -280,9 +268,17 @@ class MainActivity : AppCompatActivity() {
             loadUrlFromEditText()
             hideKeybord()
         }
-        btnBack.setOnClickListener { }
-
-        btnForward.setOnClickListener { }
+        btnGo.visibility = View.GONE
+        btnFindBack.setOnClickListener {
+            webView.findNext(false)
+        }
+        btnFindForward.setOnClickListener {
+            webView.findNext(true)
+        }
+        btnFindClose.setOnClickListener {
+            tabBarFind.visibility = View.GONE
+        }
+        tabBarFind.visibility = View.GONE
         editText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             // If the event is a key-down event on the "enter" button
             if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -400,11 +396,13 @@ class MainActivity : AppCompatActivity() {
                     super.onPageStarted(view, url, favicon)
                     webView.requestFocus()
                     editText.setText(url)
-                    if (url!!.indexOf("http:") >= 0 || url.indexOf("https:") >= 0) {
+                    if (url!!.startsWith("http:") || url.startsWith("https:") || url!!.startsWith("javascript:")) {
                         //addToBack(url);
                     } else {
                         back = true
                         runToExternal(url)
+                        view!!.stopLoading()
+                        editText.setText(webView.url)
                         //webView.loadUrl(webView.copyBackForwardList().currentItem.originalUrl)
                     }
 
@@ -444,6 +442,10 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     super.onPageFinished(view, url)
+                }
+
+                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                    return super.shouldOverrideUrlLoading(view, request)
                 }
 
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
@@ -606,7 +608,7 @@ class MainActivity : AppCompatActivity() {
         } else if (id == R.id.menu_exit) {
             exitDialog()
         } else if (id == R.id.menu_refresh) {
-            loadUrlFromEditText()
+            webView.reload()
         }else if(id == R.id.menu_tab){
             switchTab()
         }else if(id == R.id.menu_find){
@@ -632,7 +634,8 @@ class MainActivity : AppCompatActivity() {
             if(editText.text == null){
 
             } else {
-            webView.findAllAsync(editText.text.toString())
+                webView.findAllAsync(editText.text.toString())
+                tabBarFind.visibility = View.VISIBLE
             }
         })
         dialog.setNegativeButton("Cancel",null)
