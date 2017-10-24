@@ -38,4 +38,7 @@
     <string name="common_string_array_pref_fab_3">共享</string>
     <string name="common_string_array_sharing_format_0">鏈結（預設值）</string>
     <string name="common_string_array_sharing_format_1">標題 + 鏈結</string>
+    <string name="common_string_array_pref_fab_4">選單</string>
+    <string name="common_string_array_pref_fab_5">切換分頁</string>
+    <string name="common_string_array_pref_fab_6">開啓於…</string>
 </resources>

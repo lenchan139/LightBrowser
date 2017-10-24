@@ -1,7 +1,6 @@
 package org.lenchan139.lightbrowser
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -10,15 +9,13 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.webkit.WebChromeClient
 import android.widget.AdapterView
-import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_settings.*
 
 import org.lenchan139.lightbrowser.Class.ClearableEditText
 import org.lenchan139.lightbrowser.Class.CommonStrings
-import org.lenchan139.lightbrowser.Class.WebViewOverride
 import org.lenchan139.lightbrowser.Settings.SettingsLVAdpter
 import org.lenchan139.lightbrowser.Settings.SettingsViewItem
 
@@ -76,6 +73,15 @@ class SettingsActivity : AppCompatActivity() {
 
 
     //onClick function below
+    override fun onResume() {
+        toolbar.title = getString(R.string.setting_activity)
+        super.onResume()
+    }
+
+    override fun onPause() {
+        toolbar.title = getString(R.string.app_name)
+        super.onPause()
+    }
 
     fun onClickHome() {
         val txtUrl = ClearableEditText(this)

@@ -29,7 +29,7 @@ public fun get_TableName(): String {
 
     companion object {
         val _DBVersion = 1
-        val _DBName = "customScriptListsV1.db"
+        val _DBName = "customScriptLists.db"
         val _TableName = "CustomScripts"
     }
 }

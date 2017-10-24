@@ -22,6 +22,7 @@ public class HistroySQLiteController {
         historySQLiteHelper =  new HistorySQLiteHelper(c);
 
     }
+
     public void addHistory(String title,String url){
         SQLiteDatabase db = historySQLiteHelper.getWritableDatabase();
         /*ContentValues values = new ContentValues();
@@ -61,7 +62,7 @@ public class HistroySQLiteController {
         String sqlSelct = "SELECT * FROM " + historySQLiteHelper.get_TableName() +
                 " WHERE _url LIKE \"%" + keyword + "%\"" +
                 " OR _title LIKE \"%" + keyword + "%\"" +
-                " GROUP BY _url" +
+                " GROUP BY _title,_url" +
                 " ORDER BY LENGTH(_url) + LENGTH(_title)*2 ASC";
         Cursor cursor = null;
         if(keyword == null || Objects.equals(keyword, "")){

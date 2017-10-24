@@ -38,7 +38,10 @@ class CommonStrings constructor(context:Context) {
         return arrayOf(context.getString(R.string.common_string_array_pref_fab_0),
                         context.getString(R.string.common_string_array_pref_fab_1), 
                         context.getString(R.string.common_string_array_pref_fab_2), 
-                        context.getString(R.string.common_string_array_pref_fab_3))
+                        context.getString(R.string.common_string_array_pref_fab_3),
+                        context.getString(R.string.common_string_array_pref_fab_4),
+                        context.getString(R.string.common_string_array_pref_fab_5),
+                        context.getString(R.string.common_string_array_pref_fab_6))
     }
     fun ARRAY_pref_Sharing_Format(): Array<String> {
         return arrayOf( context.getString(R.string.common_string_array_sharing_format_0),

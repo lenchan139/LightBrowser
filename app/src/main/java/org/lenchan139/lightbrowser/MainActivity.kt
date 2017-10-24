@@ -1,7 +1,6 @@
 package org.lenchan139.lightbrowser
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.pm.PackageManager
@@ -10,41 +9,26 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Parcelable
-import android.preference.Preference
 import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutCompat
 import android.text.TextUtils
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-
-import org.jsoup.Jsoup
 import org.lenchan139.lightbrowser.Class.*
 import org.lenchan139.lightbrowser.History.HistroySQLiteController
-
 import java.io.File
-import java.io.IOException
 import java.util.ArrayList
-import java.util.Collections
-import java.util.Objects
-
-import android.R.attr.data
-import android.R.attr.webViewStyle
-import android.app.Dialog
 import android.content.*
-import android.support.annotation.RequiresApi
-import android.support.v4.media.MediaBrowserCompat
 import android.text.Editable
 import android.view.*
 import android.webkit.*
 import android.widget.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.lenchan139.lightbrowser.CustomScript.CustomScriptUtil
 
@@ -64,9 +48,9 @@ class MainActivity : AppCompatActivity() {
     private var isWebViewInitDone = false
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //super.onActivityResult(requestCode, resultCode, data)
-        Log.i("here123","before")
+        //Log.i("here123","before")
         if (requestCode == FILECHOOSER_RESULTCODE) {
-        Log.i("here123","after")
+        //Log.i("here123","after")
             if (null == mUploadMessage)
             {
                 //mUploadMessage!!.onReceiveValue(null)
@@ -701,7 +685,16 @@ class MainActivity : AppCompatActivity() {
         } else if (curr == commonStrings.ARRAY_pref_fab()[3]) {
             fab.visibility = View.VISIBLE
             fab.setImageResource(R.drawable.fab_share)
-        } else {
+        } else if (curr == commonStrings.ARRAY_pref_fab()[4]){
+            fab.visibility = View.VISIBLE
+            fab.setImageResource(R.drawable.fab_context_menu)
+        }else if (curr == commonStrings.ARRAY_pref_fab()[5]){
+            fab.visibility = View.VISIBLE
+            fab.setImageResource(R.drawable.fab_tab_switch)
+        }else if (curr == commonStrings.ARRAY_pref_fab()[6]){
+            fab.visibility = View.VISIBLE
+            fab.setImageResource(R.drawable.fab_open_with)
+        }else {
             fab.visibility = View.GONE
         }
 
@@ -717,6 +710,12 @@ class MainActivity : AppCompatActivity() {
             loadUrlFromEditText()
         } else if (curr == commonStrings.ARRAY_pref_fab()[3]) {
             shareCurrPage()
+        } else if (curr == commonStrings.ARRAY_pref_fab()[4]) {
+            toolbar.showOverflowMenu()
+        } else if (curr == commonStrings.ARRAY_pref_fab()[5]) {
+            switchTab()
+        } else if (curr == commonStrings.ARRAY_pref_fab()[6]) {
+            runToExternal(webView.url)
         } else {
             fab.visibility = View.GONE
         }

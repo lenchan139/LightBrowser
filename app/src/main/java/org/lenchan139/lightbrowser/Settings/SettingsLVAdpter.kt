@@ -10,6 +10,7 @@ import android.widget.TextView
 
 import org.lenchan139.lightbrowser.R
 import org.lenchan139.lightbrowser.Settings.SettingsViewItem
+import org.w3c.dom.Text
 
 /**
  * Created by len on 27/1/2017.
@@ -42,8 +43,8 @@ class SettingsLVAdpter(context: Context, private val svi: List<SettingsViewItem>
             convertView = myInflater.inflate(R.layout.settings_view_item, null)
             val ocl: View.OnClickListener = View.OnClickListener {  }
             holder = SettingsViewHolder(
-                    convertView!!.findViewById(R.id.title) as TextView,
-                    convertView.findViewById(R.id.time) as TextView,
+                    convertView!!.findViewById<TextView>(R.id.title),
+                    convertView.findViewById<TextView>(R.id.time),
                     ocl
             )
             convertView.tag = holder

@@ -2,8 +2,6 @@ package org.lenchan139.lightbrowser.Class;
 
 import android.content.Intent;
 import android.os.Parcelable;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**

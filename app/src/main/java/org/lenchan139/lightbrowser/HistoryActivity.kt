@@ -26,6 +26,7 @@ class HistoryActivity : AppCompatActivity() {
         hList = findViewById(R.id.historyList) as ListView
         fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { finish() }
+        supportActionBar?.title = "History"
         val showlist = arrayOfNulls<String>(historyList.size)
         for (i in historyList.indices) {
             showlist[i] = historyList[i].title + "\n" + historyList[i].url
