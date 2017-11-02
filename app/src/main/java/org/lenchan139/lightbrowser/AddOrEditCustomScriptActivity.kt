@@ -14,7 +14,7 @@ import org.lenchan139.lightbrowser.CustomScript.CustomScriptUtil
 
 class AddOrEditCustomScriptActivity : AppCompatActivity() {
     lateinit var csController : CustomScriptSQLiteController
-    var isEditMode : Boolean = false
+    var isEditMode  : Boolean = false
     var inEditTitle : String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

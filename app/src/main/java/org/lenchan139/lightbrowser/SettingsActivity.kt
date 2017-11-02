@@ -124,7 +124,7 @@ class SettingsActivity : AppCompatActivity() {
         txtUrl.imeOptions = EditorInfo.IME_ACTION_DONE
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.setting_string_custom_user_agent_title))
-                //.setMessage("Enter new URL of homepage")
+                .setMessage("***It will make Tools/Desktop Mode to be disabled.***")
                 .setView(txtUrl)
                 .setNeutralButton(getString(R.string.setting_string_default), DialogInterface.OnClickListener { dialog, which ->
                     sp!!.edit().remove(commonStrings.TAG_pref_custom_user_agent()).commit()

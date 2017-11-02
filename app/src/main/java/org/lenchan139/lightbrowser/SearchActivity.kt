@@ -82,19 +82,6 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
-    override fun onBackPressed() {
-        val mngr = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-
-        val taskList = mngr.getRunningTasks(10)
-
-        if (taskList[0].numActivities == 1 && taskList[0].topActivity.className == this.javaClass.name) {
-            //This is last activity in the stack
-            startActivity(Intent(this,MainActivity.javaClass))
-            finish()
-        }else{
-            finish()
-        }
-    }
 
     override fun onPause() {
         finish()

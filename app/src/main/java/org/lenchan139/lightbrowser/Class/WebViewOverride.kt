@@ -21,12 +21,16 @@ import android.widget.Toast
 import org.lenchan139.lightbrowser.MainActivity
 
 import org.droidparts.Injector.getApplicationContext
+import android.webkit.WebSettings
+
+
 
 /**
  * Created by len on 12/16/16.
  */
 
 class WebViewOverride : WebView {
+    private var isDesktopMode = false
     internal var context: Context
 
     constructor(context: Context) : super(context) {
@@ -112,4 +116,27 @@ class WebViewOverride : WebView {
             menu.add(0, 4, 0, "Share Link").setOnMenuItemClickListener(handler)
         }
     }
+
+    fun setDesktopMode(enabled: Boolean) {
+        val webSettings = settings
+
+        val newUserAgent: String
+        if (enabled) {
+            newUserAgent = webSettings.userAgentString.replace("Mobile", "eliboM").replace("Android", "diordnA")
+            isDesktopMode = true
+        } else {
+            newUserAgent = webSettings.userAgentString.replace("eliboM", "Mobile").replace("diordnA", "Android")
+            isDesktopMode = false
+        }
+
+        webSettings.userAgentString = newUserAgent
+        webSettings.useWideViewPort = enabled
+        webSettings.loadWithOverviewMode = enabled
+        webSettings.setSupportZoom(enabled)
+        webSettings.builtInZoomControls = enabled
+    }
+    fun getDesktopModeStatus() : Boolean{
+        return isDesktopMode
+    }
+
 }

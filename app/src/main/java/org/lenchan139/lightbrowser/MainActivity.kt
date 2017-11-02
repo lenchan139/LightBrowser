@@ -605,6 +605,9 @@ class MainActivity : AppCompatActivity() {
             findContent()
         }else if(id == R.id.menu_custom_script){
             openCustomScriptActivity()
+        }else if(id == R.id.menu_desktop_mode_switch){
+            webView.setDesktopMode(!webView.getDesktopModeStatus())
+            webView.reload()
         }
         return super.onOptionsItemSelected(item)
     }
