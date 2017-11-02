@@ -232,11 +232,17 @@ class MainActivity : AppCompatActivity() {
 
                     // No explanation needed, we can request the permission.
                     Toast.makeText(this, "This Appp need permission for Downloading, please allow it.", Toast.LENGTH_LONG).show()
-                    val STORAGE_PERMISSION_ID = 112
-                    ActivityCompat.requestPermissions(this@MainActivity,
-                            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                            STORAGE_PERMISSION_ID)
+                    val dialog = AlertDialog.Builder(this)
+                    dialog.setTitle("Storage Access Required")
+                            .setMessage("This Appp need internal storage permission for Download File, please allow it.")
+                            .setCancelable(false)
+                            .setPositiveButton("Grant", DialogInterface.OnClickListener { dialogInterface, i ->
+                                val STORAGE_PERMISSION_ID = 112
+                                ActivityCompat.requestPermissions(this@MainActivity,
+                                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                                        STORAGE_PERMISSION_ID)
 
+                            }).create().show()
                     // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                     // app-defined int constant. The callback method gets the
                     // result of the request.
@@ -631,7 +637,7 @@ class MainActivity : AppCompatActivity() {
             webView = findViewById(R.id.webView2) as WebViewOverride
             (findViewById(R.id.webView2) as WebViewOverride).visibility = View.VISIBLE
             (findViewById(R.id.webView1) as WebViewOverride).visibility = View.GONE
-            editText.text = Editable.Factory.getInstance().newEditable(webView.url)
+            editText.setText(webView.url)
             btnSwitchWebView.text = "2"
             Toast.makeText(this,getString(R.string.multi_tab_turn_secondary_tab),Toast.LENGTH_SHORT).show()
             webviewBundleSaved = !webviewBundleSaved

@@ -23,6 +23,10 @@ import org.lenchan139.lightbrowser.History.CustomScriptItem
 import org.lenchan139.lightbrowser.History.HistroySQLiteController
 
 import java.util.ArrayList
+import android.app.ActivityManager
+import android.support.v4.app.FragmentActivity
+import android.util.Log
+
 
 class SearchActivity : AppCompatActivity() {
     private var histroySQLiteController: HistroySQLiteController? = null
@@ -76,6 +80,25 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         })
+    }
+
+    override fun onBackPressed() {
+        val mngr = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        val taskList = mngr.getRunningTasks(10)
+
+        if (taskList[0].numActivities == 1 && taskList[0].topActivity.className == this.javaClass.name) {
+            //This is last activity in the stack
+            startActivity(Intent(this,MainActivity.javaClass))
+            finish()
+        }else{
+            finish()
+        }
+    }
+
+    override fun onPause() {
+        finish()
+        super.onPause()
     }
 
     private fun updateListView() {

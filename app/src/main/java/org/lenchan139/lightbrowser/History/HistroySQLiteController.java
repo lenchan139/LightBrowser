@@ -35,7 +35,7 @@ public class HistroySQLiteController {
                                     "(_title,_url,_addDate) VALUES(\"" +
                                     title +"\",\"" + url +"\",\"" +
                                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime()) + "\")";
-        Log.v("s",sqlInsert);
+        Log.v("logHistroyAdd",sqlInsert);
         db.execSQL(sqlInsert);
         db.close();
     }

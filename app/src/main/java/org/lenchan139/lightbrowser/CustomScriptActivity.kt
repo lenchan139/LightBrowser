@@ -26,6 +26,11 @@ class CustomScriptActivity : AppCompatActivity() {
 
     }
 
+    override fun onPause() {
+        finish()
+        super.onPause()
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
