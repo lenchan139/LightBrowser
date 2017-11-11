@@ -381,17 +381,19 @@ class MainActivity : AppCompatActivity() {
             webView.setWebViewClient(object : WebViewClient() {
                 internal var loadingFinish: Boolean? = true
                 internal var redirectPage: Boolean? = false
+
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                     loadingFinish = false
                     super.onPageStarted(view, url, favicon)
                     webView.requestFocus()
                     editText.setText(url)
+                    Log.v("onPageLoadUrl",url)
                     if (url!!.startsWith("http:") || url.startsWith("https:") || url!!.startsWith("javascript:")) {
                         //addToBack(url);
                     } else {
                         back = true
-                        runToExternal(url)
                         view!!.stopLoading()
+                        runToExternal(url)
                         editText.setText(webView.url)
                         //webView.loadUrl(webView.copyBackForwardList().currentItem.originalUrl)
                     }
@@ -435,7 +437,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                    return super.shouldOverrideUrlLoading(view, request)
+                    return true
                 }
 
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
