@@ -388,12 +388,12 @@ class MainActivity : AppCompatActivity() {
                     webView.requestFocus()
                     editText.setText(url)
                     Log.v("onPageLoadUrl",url)
-                    if (url!!.startsWith("http:") || url.startsWith("https:") || url!!.startsWith("javascript:")) {
+                    if (isUrlVaildRedirect(url!!)) {
                         //addToBack(url);
                     } else {
                         back = true
                         view!!.stopLoading()
-                        runToExternal(url)
+                        runToExternal(url!!)
                         editText.setText(webView.url)
                         //webView.loadUrl(webView.copyBackForwardList().currentItem.originalUrl)
                     }
@@ -437,7 +437,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                    return true
+                    return !(isUrlVaildRedirect(request!!.url.toString()))
                 }
 
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
@@ -731,7 +731,13 @@ class MainActivity : AppCompatActivity() {
             fab.visibility = View.GONE
         }
     }
-
+    fun isUrlVaildRedirect(url: String):Boolean{
+        if (url!!.startsWith("http:") || url.startsWith("https:") || url!!.startsWith("javascript:")) {
+            return true
+        } else {
+            return false
+        }
+    }
     companion object {
         private val FILECHOOSER_RESULTCODE = 859
     }
