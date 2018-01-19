@@ -24,6 +24,7 @@ import org.lenchan139.lightbrowser.History.HistroySQLiteController
 import java.io.File
 import java.util.ArrayList
 import android.content.*
+import android.os.Message
 import android.text.Editable
 import android.view.*
 import android.webkit.*
@@ -46,6 +47,8 @@ class MainActivity : AppCompatActivity() {
     private var webviewBundleSaved = false
     private lateinit var btnSwitchWebView : Button
     private var isWebViewInitDone = false
+    private lateinit var arrWebivewLinear : LinearLayout
+    private lateinit var webviewList : TabsController
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //super.onActivityResult(requestCode, resultCode, data)
         //Log.i("here123","before")
@@ -196,18 +199,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
+
+
+
         commonStrings = CommonStrings(applicationContext)
         webView = findViewById(R.id.webView1) as WebViewOverride
         editText = findViewById(R.id.editText) as ClearableEditText
         progLoading = findViewById(R.id.progressL) as ProgressBar
         settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         btnGo = findViewById(R.id.btnGo) as Button
-
-        btnSwitchWebView = findViewById(R.id.btnSwitchView) as Button
-        btnSwitchWebView.setOnClickListener {
-            switchTab()
-        }
+        arrWebivewLinear = findViewById(R.id.webViewList) as LinearLayout
         homeUrl = settings.getString(commonStrings.TAG_pref_home(), commonStrings.URL_DDG())
+        webviewList = TabsController(homeUrl)
+        btnSwitchWebView = findViewById(R.id.btnSwitchView) as Button
+
+        btnSwitchWebView.setOnClickListener {
+            switchTab(this)
+        }
+
 
         registerForContextMenu(webView)
         val fab = findViewById(R.id.fab) as FloatingActionButton
@@ -291,170 +300,13 @@ class MainActivity : AppCompatActivity() {
         }
         editText.isFocusable = false
 
-        fun initWebView(webView : WebView){
-            webView.settings.javaScriptEnabled = true
-            webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-            settings.edit().putString(commonStrings.TAG_pref_custom_user_agent_default(),webView.settings.userAgentString).commit()
-            var default = webView.settings.userAgentString
-            webView.settings.userAgentString = settings.getString(commonStrings.TAG_pref_custom_user_agent(),default)
 
-            webView.setFindListener ( object : WebView.FindListener{
-                override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
-
-                }
-            }
-
-
-            )
-            webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
-                val request = DownloadManager.Request(
-                        Uri.parse(url))
-                val cm = CookieManager.getInstance().getCookie(url)
-                request.allowScanningByMediaScanner()
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) //Notify client once download is completed!
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "d_" + url.substring(url.lastIndexOf("/")))
-                request.addRequestHeader("Cookie", cm)
-                val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                dm.enqueue(request)
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT) //This is important!
-                intent.addCategory(Intent.CATEGORY_OPENABLE) //CATEGORY.OPENABLE
-                intent.type = "*/*"//any application,any extension
-                Toast.makeText(applicationContext, "Downloading...", //To notify the Client that the file is being downloaded
-                        Toast.LENGTH_LONG).show()
-            }
-            webView.setWebChromeClient(object : WebChromeClient() {
-                override fun onCloseWindow(window: WebView) {
-                    onBackPressed()
-                    super.onCloseWindow(window)
-                }
-
-                override fun onReceivedTitle(view: WebView, title: String) {
-                    super.onReceivedTitle(view, title)
-                    Log.v("currWebViewTitle", title)
-                }
-
-                override fun onShowFileChooser(webView: WebView?, filePathCallback: ValueCallback<Array<Uri>>?, fileChooserParams: FileChooserParams?): Boolean {
-                    if (mUploadMessage != null) {
-                        mUploadMessage!!.onReceiveValue(null)
-                    }
-                    Log.i("UPFILE", "file chooser params：" + fileChooserParams!!.toString())
-                    mUploadMessage = filePathCallback
-                    val i = Intent(Intent.ACTION_GET_CONTENT)
-                    i.addCategory(Intent.CATEGORY_OPENABLE)
-
-                    Log.v("acceptType", fileChooserParams.acceptTypes[0].toString())
-                    if (fileChooserParams != null && fileChooserParams.acceptTypes != null
-                            && fileChooserParams.acceptTypes.size > 0) {
-                        i.type = fileChooserParams.acceptTypes[0]
-                        i.type = "*/*"
-                    } else {
-                        i.type = "*/*"
-                    }
-                    startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE)
-                    return true
-                }
-
-                //Android 5.0+ Uploads
-                 fun onShowFileChooser1(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams?): Boolean {
-                   return false
-                }
-
-                override fun onProgressChanged(view: WebView, progress: Int) {
-                    if (progress < 100) {
-                        progLoading.visibility = ProgressBar.VISIBLE
-                        progLoading.progress = progress
-                    } else if (progress >= 100) {
-                        progLoading.progress = progress
-                        try {
-                            Thread.sleep(300)
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        }
-
-                        //progLoading.setVisibility(ProgressBar.INVISIBLE);
-                        progLoading.progress = 0
-                        progLoading.visibility = ProgressBar.GONE
-                    }
-
-                }
-            })
-            webView.setWebViewClient(object : WebViewClient() {
-                internal var loadingFinish: Boolean? = true
-                internal var redirectPage: Boolean? = false
-
-                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                    loadingFinish = false
-                    super.onPageStarted(view, url, favicon)
-                    webView.requestFocus()
-                    editText.setText(url)
-                    Log.v("onPageLoadUrl",url)
-                    if (isUrlVaildRedirect(url!!)) {
-                        //addToBack(url);
-                    } else {
-                        back = true
-                        view!!.stopLoading()
-                        runToExternal(url!!)
-                        editText.setText(webView.url)
-                        //webView.loadUrl(webView.copyBackForwardList().currentItem.originalUrl)
-                    }
-
-                    var cm: String? = CookieManager.getInstance().getCookie(url)
-                    if (cm == null) {
-                        cm = ""
-                    }
-
-                }
-
-
-
-                var isInitDone = false
-                override fun onPageFinished(view: WebView, url: String) : Unit{
-
-                    if (!redirectPage!!) {
-                        loadingFinish = true
-
-                    }
-
-                    if (loadingFinish!! && (!redirectPage!!)) {
-                        //HIDE LOADING IT HAS FINISHED
-                        //addToBack(url,view.getTitle());
-                        val hs = HistroySQLiteController(this@MainActivity)
-                        hs.addHistory(view.title, view.url)
-
-                        //runCustomScript(s)
-                        val runscripts = CustomScriptUtil().getScriptsToRun(baseContext,url)
-                        if(runscripts.size > 0 && isInitDone){
-                            for(i in runscripts){
-                                view.evaluateJavascript(i,null)
-                            }
-                        }
-                        isInitDone = true
-                    } else {
-                        redirectPage = false
-                    }
-
-                    super.onPageFinished(view, url)
-                }
-
-                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                    return !(isUrlVaildRedirect(request!!.url.toString()))
-                }
-
-                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                    Log.v("backListString", backList.toString())
-                    if ((!loadingFinish!!)) {
-                        redirectPage = true
-                    }
-                    loadingFinish = false
-                    view.loadUrl(url)
-                    //addToBack(url);
-
-                    return true
-                }
-            })
-        }
-        initWebView(findViewById(R.id.webView1) as WebViewOverride)
-        initWebView(findViewById(R.id.webView2) as WebViewOverride)
+        //arrWebivew.add(findViewById(R.id.webView1) as WebViewOverride)
+        //arrWebivew.add(findViewById(R.id.webView2) as WebViewOverride)
+        //for(w in arrWebivew){
+        //    initWebView(w)
+       // }
+        newTab(this)
         hideKeybord()
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         val inUrl = intent.getStringExtra(getString(R.string.KEY_INURL_INTENT))
@@ -523,8 +375,220 @@ class MainActivity : AppCompatActivity() {
 
         return true
     }
+    fun initWebView(webView : WebViewOverride):WebViewOverride{
+        webView.settings.javaScriptEnabled = true
+        webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
+        settings.edit().putString(commonStrings.TAG_pref_custom_user_agent_default(),webView.settings.userAgentString).commit()
+        var default = webView.settings.userAgentString
+        webView.settings.userAgentString = settings.getString(commonStrings.TAG_pref_custom_user_agent(),default)
+
+        webView.setFindListener ( object : WebView.FindListener{
+            override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
+
+            }
+        }
 
 
+        )
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            val request = DownloadManager.Request(
+                    Uri.parse(url))
+            val cm = CookieManager.getInstance().getCookie(url)
+            request.allowScanningByMediaScanner()
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) //Notify client once download is completed!
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "d_" + url.substring(url.lastIndexOf("/")))
+            request.addRequestHeader("Cookie", cm)
+            val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            dm.enqueue(request)
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT) //This is important!
+            intent.addCategory(Intent.CATEGORY_OPENABLE) //CATEGORY.OPENABLE
+            intent.type = "*/*"//any application,any extension
+            Toast.makeText(applicationContext, "Downloading...", //To notify the Client that the file is being downloaded
+                    Toast.LENGTH_LONG).show()
+        }
+        webView.setWebChromeClient(object : WebChromeClient() {
+            override fun onCloseWindow(window: WebView) {
+                onBackPressed()
+                super.onCloseWindow(window)
+            }
+
+            override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
+                newTab(this@MainActivity)
+                return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
+            }
+
+            override fun onReceivedTitle(view: WebView, title: String) {
+                super.onReceivedTitle(view, title)
+                Log.v("currWebViewTitle", title)
+            }
+
+            override fun onShowFileChooser(webView: WebView?, filePathCallback: ValueCallback<Array<Uri>>?, fileChooserParams: FileChooserParams?): Boolean {
+                if (mUploadMessage != null) {
+                    mUploadMessage!!.onReceiveValue(null)
+                }
+                Log.i("UPFILE", "file chooser params：" + fileChooserParams!!.toString())
+                mUploadMessage = filePathCallback
+                val i = Intent(Intent.ACTION_GET_CONTENT)
+                i.addCategory(Intent.CATEGORY_OPENABLE)
+
+                Log.v("acceptType", fileChooserParams.acceptTypes[0].toString())
+                if (fileChooserParams != null && fileChooserParams.acceptTypes != null
+                        && fileChooserParams.acceptTypes.size > 0) {
+                    i.type = fileChooserParams.acceptTypes[0]
+                    i.type = "*/*"
+                } else {
+                    i.type = "*/*"
+                }
+                startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE)
+                return true
+            }
+
+            //Android 5.0+ Uploads
+            fun onShowFileChooser1(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams?): Boolean {
+                return false
+            }
+
+            override fun onProgressChanged(view: WebView, progress: Int) {
+                if (progress < 100) {
+                    progLoading.visibility = ProgressBar.VISIBLE
+                    progLoading.progress = progress
+                } else if (progress >= 100) {
+                    progLoading.progress = progress
+                    try {
+                        Thread.sleep(300)
+                    } catch (e: InterruptedException) {
+                        e.printStackTrace()
+                    }
+
+                    //progLoading.setVisibility(ProgressBar.INVISIBLE);
+                    progLoading.progress = 0
+                    progLoading.visibility = ProgressBar.GONE
+                }
+
+            }
+        })
+        webView.setWebViewClient(object : WebViewClient() {
+            internal var loadingFinish: Boolean? = true
+            internal var redirectPage: Boolean? = false
+
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                loadingFinish = false
+                super.onPageStarted(view, url, favicon)
+                webView.requestFocus()
+                editText.setText(url)
+                Log.v("onPageLoadUrl",url)
+                if (isUrlVaildRedirect(url!!)) {
+                    //addToBack(url);
+                } else {
+                    back = true
+                    view!!.stopLoading()
+                    runToExternal(url!!)
+                    editText.setText(webView.url)
+                    //webView.loadUrl(webView.copyBackForwardList().currentItem.originalUrl)
+                }
+
+                var cm: String? = CookieManager.getInstance().getCookie(url)
+                if (cm == null) {
+                    cm = ""
+                }
+
+            }
+
+
+
+            var isInitDone = false
+            override fun onPageFinished(view: WebView, url: String) : Unit{
+
+                if (!redirectPage!!) {
+                    loadingFinish = true
+
+                }
+
+                if (loadingFinish!! && (!redirectPage!!)) {
+                    //HIDE LOADING IT HAS FINISHED
+                    //addToBack(url,view.getTitle());
+                    val hs = HistroySQLiteController(this@MainActivity)
+                    hs.addHistory(view.title, view.url)
+
+                    //runCustomScript(s)
+                    val runscripts = CustomScriptUtil().getScriptsToRun(baseContext,url)
+                    if(runscripts.size > 0 && isInitDone){
+                        for(i in runscripts){
+                            view.evaluateJavascript(i,null)
+                        }
+                    }
+                    isInitDone = true
+                } else {
+                    redirectPage = false
+                }
+
+                super.onPageFinished(view, url)
+            }
+
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                return !(isUrlVaildRedirect(request!!.url.toString()))
+            }
+
+            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                Log.v("backListString", backList.toString())
+                if ((!loadingFinish!!)) {
+                    redirectPage = true
+                }
+                loadingFinish = false
+                view.loadUrl(url)
+                //addToBack(url);
+
+                return true
+            }
+        })
+        return webView
+    }
+    fun newTab(activity: Activity){
+
+        var nwv = WebViewOverride(this)
+        nwv.setLayoutParams(LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT))
+        var newWebview = initWebView(nwv)
+        webviewList.newWebView(this, arrWebivewLinear, newWebview)
+
+
+    }
+    fun switchTab(activity:Activity) {
+        fun updateStichCount() {
+            if (webviewList.size() <= 99) {
+                btnSwitchWebView.text = webviewList.size().toString()
+            } else if(webviewList.size()  <= 0) {
+                btnSwitchWebView.text = "0"
+            }else{
+                btnSwitchWebView.text = "u+"
+            }
+
+        }
+            updateStichCount()
+        var items = Array<String>(webviewList.size(), { "" })
+        for ((i, w) in webviewList.getList().withIndex()) {
+            if(i==webviewList.currIndex) {
+                items.set(i, "▶" + w.title + "\n" + w.url)
+            }else{
+                items.set(i, "▷" + w.title + "\n" + w.url)
+            }
+        }
+        var dialog = AlertDialog.Builder(this).setTitle("Tabs:")
+                .setItems(items) { dialog, which ->
+                    webviewList.switchToTab(this, which)
+                    updateStichCount()
+                }
+                .setPositiveButton("New", DialogInterface.OnClickListener { dialog, which ->
+                    newTab(activity)
+                    updateStichCount()
+                }).create()
+        dialog.show()
+
+
+
+
+    }
     fun shareCurrPage() {
 
         val sendIntent = Intent()
@@ -602,7 +666,7 @@ class MainActivity : AppCompatActivity() {
         } else if (id == R.id.menu_refresh) {
             webView.reload()
         }else if(id == R.id.menu_tab){
-            switchTab()
+            switchTab(this@MainActivity)
         }else if(id == R.id.menu_find){
             findContent()
         }else if(id == R.id.menu_custom_script){
@@ -637,25 +701,6 @@ class MainActivity : AppCompatActivity() {
 
         dialog.create().show()
     }
-    fun switchTab(){
-        if(!webviewBundleSaved){
-            webView = findViewById(R.id.webView2) as WebViewOverride
-            (findViewById(R.id.webView2) as WebViewOverride).visibility = View.VISIBLE
-            (findViewById(R.id.webView1) as WebViewOverride).visibility = View.GONE
-            editText.setText(webView.url)
-            btnSwitchWebView.text = "2"
-            Toast.makeText(this,getString(R.string.multi_tab_turn_secondary_tab),Toast.LENGTH_SHORT).show()
-            webviewBundleSaved = !webviewBundleSaved
-        }else{
-            webView = findViewById(R.id.webView1) as WebViewOverride
-            (findViewById(R.id.webView1) as WebViewOverride).visibility = View.VISIBLE
-            (findViewById(R.id.webView2) as WebViewOverride).visibility = View.GONE
-            editText.text = Editable.Factory.getInstance().newEditable(webView.url)
-            Toast.makeText(this,getString(R.string.multi_tab_turn_primary_tab),Toast.LENGTH_SHORT).show()
-            btnSwitchWebView.text = "1"
-            webviewBundleSaved = !webviewBundleSaved
-        }
-    }
     fun hideKeybord() {
         val view = this.currentFocus
         if (view != null) {
@@ -665,6 +710,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadUrlFromEditText() {
+        var webView = webviewList.getCurrentWebview()
         val temp = editText.text.toString().trim { it <= ' ' }
         if (temp.startsWith("javascript:")) {
             webView.loadUrl(temp)
@@ -724,7 +770,7 @@ class MainActivity : AppCompatActivity() {
         } else if (curr == commonStrings.ARRAY_pref_fab()[4]) {
             toolbar.showOverflowMenu()
         } else if (curr == commonStrings.ARRAY_pref_fab()[5]) {
-            switchTab()
+            switchTab(this@MainActivity)
         } else if (curr == commonStrings.ARRAY_pref_fab()[6]) {
             runToExternal(webView.url)
         } else {
@@ -738,6 +784,7 @@ class MainActivity : AppCompatActivity() {
             return false
         }
     }
+
     companion object {
         private val FILECHOOSER_RESULTCODE = 859
     }

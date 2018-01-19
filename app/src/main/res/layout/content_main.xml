@@ -56,7 +56,13 @@
             android:text="next"
             android:layout_weight="9999"/>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/webViewList">
 
+    </LinearLayout>
     <org.lenchan139.lightbrowser.Class.WebViewOverride
         android:layout_width="match_parent"
         android:layout_height="match_parent"
