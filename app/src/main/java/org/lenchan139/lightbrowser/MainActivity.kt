@@ -34,7 +34,6 @@ import kotlinx.android.synthetic.main.content_main.*
 import org.lenchan139.lightbrowser.CustomScript.CustomScriptUtil
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var  webView: WebViewOverride
     private lateinit var btnGo: Button
     private lateinit var editText: ClearableEditText
     private lateinit var settings: SharedPreferences
@@ -87,7 +86,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyLongPress(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val webList = webView.copyBackForwardList()
+            val webList = webviewList.getCurrentWebview().copyBackForwardList()
 
             //create String[] for showing
             val items = arrayOfNulls<String>(webList.size)
@@ -123,7 +122,7 @@ class MainActivity : AppCompatActivity() {
                             val pushingUrl = webList.getItemAtIndex(which).url
                             //int a1 = which - webView.copyBackForwardList().getCurrentIndex();
                             //Log.v("test", String.valueOf(a1));
-                            webView.goBackOrForward(which - webView.copyBackForwardList().currentIndex)
+                            webviewList.getCurrentWebview().goBackOrForward(which - webviewList.getCurrentWebview().copyBackForwardList().currentIndex)
                             //webView.loadUrl(pushingUrl);
 
 
@@ -147,8 +146,8 @@ class MainActivity : AppCompatActivity() {
             }else{
                 exitDialog();
             }*/
-        if (webView.canGoBack()) {
-            webView.goBack()
+        if (webviewList.getCurrentWebview().canGoBack()) {
+            webviewList.getCurrentWebview().goBack()
         } else {
             exitDialog()
         }
@@ -172,6 +171,7 @@ class MainActivity : AppCompatActivity() {
         val inUrl = intent.getStringExtra(getString(R.string.KEY_INURL_INTENT))
         if (inUrl != null) {
             editText.setText(inUrl)
+            newTab(this)
             loadUrlFromEditText()
         } else {
             super.onNewIntent(intent)
@@ -203,7 +203,6 @@ class MainActivity : AppCompatActivity() {
 
 
         commonStrings = CommonStrings(applicationContext)
-        webView = findViewById(R.id.webView1) as WebViewOverride
         editText = findViewById(R.id.editText) as ClearableEditText
         progLoading = findViewById(R.id.progressL) as ProgressBar
         settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -211,6 +210,7 @@ class MainActivity : AppCompatActivity() {
         arrWebivewLinear = findViewById(R.id.webViewList) as LinearLayout
         homeUrl = settings.getString(commonStrings.TAG_pref_home(), commonStrings.URL_DDG())
         webviewList = TabsController(homeUrl)
+        newTab(this)
         btnSwitchWebView = findViewById(R.id.btnSwitchView) as Button
 
         btnSwitchWebView.setOnClickListener {
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        registerForContextMenu(webView)
+        registerForContextMenu(webviewList.getCurrentWebview())
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { callFabButton() }
         initFabButton()
@@ -269,10 +269,10 @@ class MainActivity : AppCompatActivity() {
         }
         btnGo.visibility = View.GONE
         btnFindBack.setOnClickListener {
-            webView.findNext(false)
+            webviewList.getCurrentWebview().findNext(false)
         }
         btnFindForward.setOnClickListener {
-            webView.findNext(true)
+            webviewList.getCurrentWebview().findNext(true)
         }
         btnFindClose.setOnClickListener {
             tabBarFind.visibility = View.GONE
@@ -296,7 +296,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, SearchActivity::class.java)
             intent.putExtra("para", editText.text.toString())
             startActivity(intent)
-            webView.requestFocus()
+            webviewList.getCurrentWebview().requestFocus()
         }
         editText.isFocusable = false
 
@@ -306,7 +306,6 @@ class MainActivity : AppCompatActivity() {
         //for(w in arrWebivew){
         //    initWebView(w)
        // }
-        newTab(this)
         hideKeybord()
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         val inUrl = intent.getStringExtra(getString(R.string.KEY_INURL_INTENT))
@@ -319,11 +318,11 @@ class MainActivity : AppCompatActivity() {
             (findViewById(R.id.webView2) as WebViewOverride).loadUrl(homeUrl)
             (findViewById(R.id.webView1) as WebViewOverride).loadUrl(homeUrl)
         }
-        webView.settings.builtInZoomControls = true
-        webView.settings.displayZoomControls = false
-        Log.v("USERAGENT", webView.settings.userAgentString)
+        webviewList.getCurrentWebview().settings.builtInZoomControls = true
+        webviewList.getCurrentWebview().settings.displayZoomControls = false
+        Log.v("USERAGENT", webviewList.getCurrentWebview().settings.userAgentString)
 
-        webView.requestFocus()
+        webviewList.getCurrentWebview().requestFocus()
 
     }
 
@@ -595,9 +594,9 @@ class MainActivity : AppCompatActivity() {
         var sfType = settings.getInt(CommonStrings(baseContext).TAG_pref_sharing_format_int(),0)
         var  sfContent = ""
         if(sfType == 0){
-            sfContent = webView.url
+            sfContent = webviewList.getCurrentWebview().url
         }else if(sfType == 1){
-            sfContent = webView.title + "\n" + webView.url
+            sfContent = webviewList.getCurrentWebview().title + "\n" + webviewList.getCurrentWebview().url
         }
         sendIntent.action = Intent.ACTION_SEND
         sendIntent.putExtra(Intent.EXTRA_TEXT, sfContent)
@@ -618,13 +617,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             return true
         } else if (id == R.id.menu_home) {
-            webView.loadUrl(settings.getString(commonStrings.TAG_pref_home(), ""))
+            webviewList.getCurrentWebview().loadUrl(settings.getString(commonStrings.TAG_pref_home(), ""))
             return true
         } else if (id == R.id.menu_share) {
             shareCurrPage()
             return true
         } else if (id == R.id.menu_external) {
-            runToExternal(webView.url)
+            runToExternal(webviewList.getCurrentWebview().url)
 
             return true
         } else if (id == R.id.menu_history) {
@@ -636,8 +635,8 @@ class MainActivity : AppCompatActivity() {
             //launchIntent.addCategory("android.intent.category.LAUNCHER")
             //launchIntent.setAction("org.lenchan139.ncbookmark.v2.addBookmarkAction")
             launchIntent.setComponent(ComponentName("org.lenchan139.ncbookmark","org.lenchan139.ncbookmark.v2.AddBookmarkActivityV2"))
-            launchIntent.putExtra("inUrl",webView.url)
-            launchIntent.putExtra("inTitle",webView.title)
+            launchIntent.putExtra("inUrl",webviewList.getCurrentWebview().url)
+            launchIntent.putExtra("inTitle",webviewList.getCurrentWebview().title)
             try {
                 startActivity(launchIntent)//null pointer check in case package name was not found
             } catch (e: ActivityNotFoundException) {
@@ -664,7 +663,7 @@ class MainActivity : AppCompatActivity() {
         } else if (id == R.id.menu_exit) {
             exitDialog()
         } else if (id == R.id.menu_refresh) {
-            webView.reload()
+            webviewList.getCurrentWebview().reload()
         }else if(id == R.id.menu_tab){
             switchTab(this@MainActivity)
         }else if(id == R.id.menu_find){
@@ -672,8 +671,8 @@ class MainActivity : AppCompatActivity() {
         }else if(id == R.id.menu_custom_script){
             openCustomScriptActivity()
         }else if(id == R.id.menu_desktop_mode_switch){
-            webView.setDesktopMode(!webView.getDesktopModeStatus())
-            webView.reload()
+            webviewList.getCurrentWebview().setDesktopMode(!webviewList.getCurrentWebview().getDesktopModeStatus())
+            webviewList.getCurrentWebview().reload()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -693,7 +692,7 @@ class MainActivity : AppCompatActivity() {
             if(editText.text == null){
 
             } else {
-                webView.findAllAsync(editText.text.toString())
+                webviewList.getCurrentWebview().findAllAsync(editText.text.toString())
                 tabBarFind.visibility = View.VISIBLE
             }
         })
@@ -762,7 +761,7 @@ class MainActivity : AppCompatActivity() {
         val fab = findViewById(R.id.fab) as FloatingActionButton
         val curr = settings.getString(commonStrings.TAG_pref_fab(), null)
         if (curr == commonStrings.ARRAY_pref_fab()[1]) {
-            webView.loadUrl(settings.getString(commonStrings.TAG_pref_home(), ""))
+            webviewList.getCurrentWebview().loadUrl(settings.getString(commonStrings.TAG_pref_home(), ""))
         } else if (curr == commonStrings.ARRAY_pref_fab()[2]) {
             loadUrlFromEditText()
         } else if (curr == commonStrings.ARRAY_pref_fab()[3]) {
@@ -772,7 +771,7 @@ class MainActivity : AppCompatActivity() {
         } else if (curr == commonStrings.ARRAY_pref_fab()[5]) {
             switchTab(this@MainActivity)
         } else if (curr == commonStrings.ARRAY_pref_fab()[6]) {
-            runToExternal(webView.url)
+            runToExternal(webviewList.getCurrentWebview().url)
         } else {
             fab.visibility = View.GONE
         }

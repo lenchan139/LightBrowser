@@ -37,7 +37,7 @@ class TabsController(homepage:String) {
 
 
 
-        webview.loadUrl("https://www.google.com/")
+        webview.loadUrl(homeUrl)
 
         linearLayout.addView(webview);
         arrWebivew.add(webview)
