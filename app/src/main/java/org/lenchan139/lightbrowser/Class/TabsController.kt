@@ -46,6 +46,18 @@ class TabsController(homepage:String) {
 
     }
 
+    fun delWebView(activity: AppCompatActivity,linearLayout: LinearLayout,index:Int):WebViewOverride{
+        if(arrWebivew.size>1) {
+            linearLayout.removeViewAt(index)
+            arrWebivew.removeAt(index)
+            currIndex -= 1
+
+        }else{
+
+        }
+        return switchToTab(activity, arrWebivew.size - 1)
+    }
+
     fun switchToTab(activity: AppCompatActivity,  show: Int):WebViewOverride{
         for((i,w) in arrWebivew.withIndex()){
             if(i == show){

@@ -169,9 +169,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         val inUrl = intent.getStringExtra(getString(R.string.KEY_INURL_INTENT))
+        var InURLFromExternal = intent.getBooleanExtra("InURLFromExternal",false)
+        if(InURLFromExternal){
+            newTab(this)
+            intent.putExtra("InURLFromExternal",false)
+        }
         if (inUrl != null) {
             editText.setText(inUrl)
-            newTab(this)
+            //newTab(this)
             loadUrlFromEditText()
         } else {
             super.onNewIntent(intent)
@@ -210,13 +215,19 @@ class MainActivity : AppCompatActivity() {
         arrWebivewLinear = findViewById(R.id.webViewList) as LinearLayout
         homeUrl = settings.getString(commonStrings.TAG_pref_home(), commonStrings.URL_DDG())
         webviewList = TabsController(homeUrl)
-        newTab(this)
+
         btnSwitchWebView = findViewById(R.id.btnSwitchView) as Button
 
         btnSwitchWebView.setOnClickListener {
             switchTab(this)
         }
+        btnSwitchWebView.setOnLongClickListener {
 
+            delTabDialog(this)
+            true
+
+        }
+        newTab(this)
 
         registerForContextMenu(webviewList.getCurrentWebview())
         val fab = findViewById(R.id.fab) as FloatingActionButton
@@ -542,6 +553,17 @@ class MainActivity : AppCompatActivity() {
         })
         return webView
     }
+
+    fun updateStichCount() {
+        if (webviewList.size() <= 99) {
+            btnSwitchWebView.text = webviewList.size().toString()
+        } else if(webviewList.size()  <= 0) {
+            btnSwitchWebView.text = "0"
+        }else{
+            btnSwitchWebView.text = "u+"
+        }
+
+    }
     fun newTab(activity: Activity){
 
         var nwv = WebViewOverride(this)
@@ -550,20 +572,37 @@ class MainActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT))
         var newWebview = initWebView(nwv)
         webviewList.newWebView(this, arrWebivewLinear, newWebview)
-
+        updateStichCount()
 
     }
-    fun switchTab(activity:Activity) {
-        fun updateStichCount() {
-            if (webviewList.size() <= 99) {
-                btnSwitchWebView.text = webviewList.size().toString()
-            } else if(webviewList.size()  <= 0) {
-                btnSwitchWebView.text = "0"
-            }else{
-                btnSwitchWebView.text = "u+"
-            }
-
+    fun delTab(activity: Activity,index:Int){
+        if(webviewList.getList().size<=1){
+            Toast.makeText(this,"You cannot delete the last tab.", Toast.LENGTH_SHORT).show()
+        }else {
+            webviewList.delWebView(this, arrWebivewLinear, index)
         }
+        updateStichCount()
+
+    }
+    fun delTabDialog(activity: Activity){
+        updateStichCount()
+        var items = Array<String>(webviewList.size(), { "" })
+        for ((i, w) in webviewList.getList().withIndex()) {
+            if(i==webviewList.currIndex) {
+                items.set(i, "☒ " + w.title + "\n     " + w.url)
+            }else{
+                items.set(i, "☒ " + w.title + "\n     " + w.url)
+            }
+        }
+        var dialog = AlertDialog.Builder(this).setTitle("Delete Tab...")
+                .setItems(items) { dialog, which ->
+                    webviewList.delWebView(this,arrWebivewLinear, which)
+                    updateStichCount()
+                }
+                .create()
+        dialog.show()
+    }
+    fun switchTab(activity:Activity) {
             updateStichCount()
         var items = Array<String>(webviewList.size(), { "" })
         for ((i, w) in webviewList.getList().withIndex()) {
@@ -591,11 +630,11 @@ class MainActivity : AppCompatActivity() {
     fun shareCurrPage() {
 
         val sendIntent = Intent()
-        var sfType = settings.getInt(CommonStrings(baseContext).TAG_pref_sharing_format_int(),0)
+        var sfType = settings.getString(CommonStrings(baseContext).TAG_pref_sharing_format_int(),getString(R.string.common_string_array_sharing_format_0))
         var  sfContent = ""
-        if(sfType == 0){
+        if(sfType == getString(R.string.common_string_array_sharing_format_0)){
             sfContent = webviewList.getCurrentWebview().url
-        }else if(sfType == 1){
+        }else if(sfType == getString(R.string.common_string_array_sharing_format_1)){
             sfContent = webviewList.getCurrentWebview().title + "\n" + webviewList.getCurrentWebview().url
         }
         sendIntent.action = Intent.ACTION_SEND
@@ -613,7 +652,7 @@ class MainActivity : AppCompatActivity() {
 
 
         if (id == R.id.action_settings) {
-            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+            val intent = Intent(this@MainActivity, PrefActivity::class.java)
             startActivity(intent)
             return true
         } else if (id == R.id.menu_home) {

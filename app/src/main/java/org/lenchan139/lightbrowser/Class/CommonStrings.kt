@@ -67,7 +67,7 @@ class CommonStrings constructor(context:Context) {
         return "org.lenchan139.lightbrowser.TAG_pref_custom_user_agent_default"
     }
     fun TAG_pref_sharing_format_int(): String {
-        return "org.lenchan139.lightbrowser.TAG_pref_sharing_format_int"
+        return "org.lenchan139.lightbrowser.sharingformat.pref"
     }
     fun TAG_pref_sharing_format_string(): String {
         return "org.lenchan139.lightbrowser.TAG_pref_sharing_format_string"

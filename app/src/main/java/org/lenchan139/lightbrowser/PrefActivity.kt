@@ -87,8 +87,10 @@ class PrefActivity : AppCompatPreferenceActivity() {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"))
-            bindPreferenceSummaryToValue(findPreference("example_list"))
+            bindPreferenceSummaryToValue(findPreference("org.lenchan139.lightbrowser.Home"))
+            bindPreferenceSummaryToValue(findPreference("org.lenchan139.lightbrowser.Fab"))
+            bindPreferenceSummaryToValue(findPreference("org.lenchan139.lightbrowser.sharingformat.pref"))
+            bindPreferenceSummaryToValue(findPreference("org.lenchan139.lightbrowser.TAG_pref_Search_Engine_Url"))
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {

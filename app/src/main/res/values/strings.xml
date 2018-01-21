@@ -34,10 +34,14 @@
     <string name="string_pref_custom_user_agent">Custom User Agent</string>
     <string name="setting_string_custom_user_agent_title">Custom User Agent</string>
     <string name="setting_string_enter_hint">Enter your User Agent ...</string>
-    <string name="common_string_array_pref_fab_0">Disable</string>
-    <string name="common_string_array_pref_fab_1">Home</string>
-    <string name="common_string_array_pref_fab_2">Refresh</string>
-    <string name="common_string_array_pref_fab_3">Share</string>
+    <array name="common_string_array_sharing_format_array">
+        <item>Link (default)</item>
+        <item>Title + Link</item>
+    </array>
+    <array name="common_string_array_sharing_format_array_int">
+        <item>0</item>
+        <item>1</item>
+    </array>
     <string name="common_string_array_sharing_format_0">Link (default)</string>
     <string name="common_string_array_sharing_format_1">Title + Link</string>
     <string name="title_activity_pref" translatable="false">Preferences</string>
@@ -56,16 +60,41 @@
     <string name="pref_default_display_name" translatable="false">John Smith</string>
 
     <string name="pref_title_add_friends_to_messages" translatable="false">Add friends to messages</string>
-    <string-array name="pref_example_list_titles" translatable="false">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
+    <string-array name="org.lenchan139.lightbrowser.Fab.array" translatable="false">
+        <item>Disable</item>
+        <item>Home</item>
+        <item>Refresh</item>
+        <item>Share</item>
+        <item>Context Menu</item>
+        <item>Tab Switch</item>
+        <item>Open With</item>
     </string-array>
-    <string-array name="pref_example_list_values" translatable="false">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
+    <string name="common_string_array_pref_fab_title" translatable="false">Fab Button</string>
+    <string name="common_string_array_pref_fab_0">Disable</string>
+    <string name="common_string_array_pref_fab_1">Home</string>
+    <string name="common_string_array_pref_fab_2">Refresh</string>
+    <string name="common_string_array_pref_fab_3">Share</string>
+    <string name="common_string_array_pref_fab_4">Context Menu</string>
+    <string name="common_string_array_pref_fab_5">Tab Switch</string>
+    <string name="common_string_array_pref_fab_6">Open With</string>
+    <string name="common_string_default_homepage_pref" translatable="false">https://duckduckgo.com/</string>
+    <string name="common_string_homepage_title" translatable="false">Home Page</string>
+    <string name="ARRAY_pref_Search_Engine_Default_array_url_default" translatable="false">https://duckduckgo.com/?q=!@keywoard</string>
+    <array name="ARRAY_pref_Search_Engine_Default_array_name">
+        <item>DuckDuckGo</item>
+        <item>Google</item>
+    </array>
+    <array name="ARRAY_pref_Search_Engine_Default_array_url">
+        <item>https://duckduckgo.com/?q=!@keywoard</item>
+        <item>https://www.google.com/search?q=!@keywoard</item>
+    </array>
+
+
+
+
+
+
+
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync" translatable="false">Data &amp; sync</string>
@@ -113,7 +142,5 @@
     <string name="pref_ringtone_silent" translatable="false">Silent</string>
 
     <string name="pref_title_vibrate" translatable="false">Vibrate</string>
-    <string name="common_string_array_pref_fab_4">Context Menu</string>
-    <string name="common_string_array_pref_fab_5">Tab Switch</string>
-    <string name="common_string_array_pref_fab_6">Open With</string>
+
 </resources>
