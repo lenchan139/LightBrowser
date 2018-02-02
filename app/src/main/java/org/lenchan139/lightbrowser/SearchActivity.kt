@@ -67,7 +67,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable) {
                 updateListView()
-                editText.setSelection(editText.text.length)
+                //editText.setSelection(editText.text.length)
             }
         })
         editText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
