@@ -337,6 +337,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        System.exit(0)
+    }
 
     private fun runToExternal(url: String) {
         val preIntent = Intent(Intent.ACTION_VIEW,Uri.parse(url))
@@ -459,11 +463,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onProgressChanged(view: WebView, progress: Int) {
+                Log.v("webview " + view.id , "[onProgressChanged triggered]")
                 if (progress < 100) {
                     progLoading.visibility = ProgressBar.VISIBLE
                     progLoading.progress = progress
                 } else if (progress >= 100) {
                     progLoading.progress = progress
+
                     try {
                         Thread.sleep(300)
                     } catch (e: InterruptedException) {
