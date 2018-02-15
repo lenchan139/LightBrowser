@@ -32,6 +32,7 @@ import android.widget.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.lenchan139.lightbrowser.CustomScript.CustomScriptUtil
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
     private lateinit var btnGo: Button
@@ -408,15 +409,17 @@ class MainActivity : AppCompatActivity() {
             val request = DownloadManager.Request(
                     Uri.parse(url))
             val cm = CookieManager.getInstance().getCookie(url)
+            val fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimetype)
+            val fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
             request.allowScanningByMediaScanner()
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) //Notify client once download is completed!
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "d_" + url.substring(url.lastIndexOf("/")))
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,  fileName)
             request.addRequestHeader("Cookie", cm)
+            request.setDescription("[Download task from Light Browser]")
+            request.allowScanningByMediaScanner()
             val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             dm.enqueue(request)
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT) //This is important!
-            intent.addCategory(Intent.CATEGORY_OPENABLE) //CATEGORY.OPENABLE
-            intent.type = "*/*"//any application,any extension
+            Log.v("downloadMimeType", mimetype)
             Toast.makeText(applicationContext, "Downloading...", //To notify the Client that the file is being downloaded
                     Toast.LENGTH_LONG).show()
         }
