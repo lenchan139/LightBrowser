@@ -545,6 +545,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                Log.v("loadingUrl",request!!.url.toString())
                 return !(isUrlVaildRedirect(request!!.url.toString()))
             }
 
