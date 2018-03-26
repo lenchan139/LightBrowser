@@ -527,8 +527,9 @@ class MainActivity : AppCompatActivity() {
                     //HIDE LOADING IT HAS FINISHED
                     //addToBack(url,view.getTitle());
                     val hs = HistroySQLiteController(this@MainActivity)
-                    hs.addHistory(view.title, view.url)
-
+                    if(view.title.isNotEmpty() && view.title.isNotEmpty()) {
+                        hs.addHistory(view.title, view.url)
+                    }
                     //runCustomScript(s)
                     val runscripts = CustomScriptUtil().getScriptsToRun(baseContext,url)
                     if(runscripts.size > 0 && isInitDone){
