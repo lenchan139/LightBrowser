@@ -25,6 +25,7 @@ import java.io.File
 import java.util.ArrayList
 import android.content.*
 import android.os.Message
+import android.support.v4.content.FileProvider
 import android.text.Editable
 import android.view.*
 import android.webkit.*
@@ -206,9 +207,13 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        }
 
 
-        commonStrings = CommonStrings(applicationContext)
+
+    commonStrings = CommonStrings(applicationContext)
         editText = findViewById(R.id.editText) as ClearableEditText
         progLoading = findViewById(R.id.progressL) as ProgressBar
         settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -411,14 +416,44 @@ class MainActivity : AppCompatActivity() {
             val cm = CookieManager.getInstance().getCookie(url)
             val fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimetype)
             val fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+            var downloadId : Long = -1
+
             request.allowScanningByMediaScanner()
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) //Notify client once download is completed!
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,  fileName)
             request.addRequestHeader("Cookie", cm)
+            var  onComplete   = object :BroadcastReceiver(){
+
+                override fun onReceive(contxt: Context?, intent: Intent?) {
+                    val action = intent?.getAction()
+                    val manager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+                    if(DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action) && (downloadId >= 0) ){
+                        val query = DownloadManager.Query()
+                        query.setFilterById(downloadId)
+                        val c = manager.query(query)
+                        if (c.moveToFirst()) {
+                            val columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
+                                var uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                                uriString = uriString.replace("file:///","")
+                                val apkFile = File(uriString)
+
+                                Log.v("onDownloadConplete",uriString)
+                                if(apkFile.extension == "apk"){
+                                    installApk(applicationContext,apkFile)
+                                }
+                                Toast.makeText(this@MainActivity, "download success", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+            }
+
+            //registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
             request.setDescription("[Download task from Light Browser]")
             request.allowScanningByMediaScanner()
             val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            dm.enqueue(request)
+            downloadId = dm.enqueue(request)
             Log.v("downloadMimeType", mimetype)
             Toast.makeText(applicationContext, "Downloading...", //To notify the Client that the file is being downloaded
                     Toast.LENGTH_LONG).show()
@@ -833,7 +868,18 @@ class MainActivity : AppCompatActivity() {
             return false
         }
     }
-
+    fun installApk(context :Context, apkFile : File){
+        var intent =  Intent(Intent.ACTION_VIEW)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            var contentUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileProvider", apkFile);
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+        }else{
+            intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        startActivity(intent);
+    }
     companion object {
         private val FILECHOOSER_RESULTCODE = 859
     }
